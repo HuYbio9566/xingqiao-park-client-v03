@@ -2,40 +2,7 @@
   'use strict';
   function initVisitor(){
     var page=document.getElementById('visitor');
-    page.innerHTML=`
-      <ol class="visit-steps" aria-label="预约步骤"><li>1 <span>填写信息</span></li><li>2 <span>接待验证</span></li><li>3 <span>访问凭证</span></li></ol>
-      <form id="visit-info" novalidate>
-        <fieldset><legend>01 / 访客信息</legend>
-          <label for="visit-name">姓名 *</label><input id="visit-name" name="name" required maxlength="40" autocomplete="off" placeholder="请输入访客姓名">
-          <label for="visit-phone">手机号码 *</label><input id="visit-phone" name="phone" type="tel" required maxlength="11" inputmode="tel" placeholder="请输入11位手机号码">
-        </fieldset>
-        <fieldset><legend>02 / 企业接待信息</legend>
-          <label for="visit-company">到访企业 *</label><input id="visit-company" name="company" required maxlength="100" placeholder="企业全称及楼栋 / 房间">
-          <label for="visit-host">接待人员姓名 *</label><input id="visit-host" name="host" required maxlength="40" placeholder="请输入企业接待人员姓名">
-          <label for="visit-email">接待人员企业邮箱 *</label><input id="visit-email" name="email" type="email" required maxlength="120" placeholder="name@company.com"><small>请填写接待人员的企业邮箱。</small>
-        </fieldset>
-        <fieldset><legend>03 / 来访安排</legend>
-          <label for="visit-start">预计到访时间 *</label><input id="visit-start" name="start" type="datetime-local" required>
-          <label for="visit-end">预计离园时间 *</label><input id="visit-end" name="end" type="datetime-local" required><small>请填写预计离园时间。</small>
-          <label for="visit-reason">访问原因 *</label><textarea id="visit-reason" name="reason" required maxlength="500" rows="3" placeholder="例如：商务洽谈、项目交流，请简要说明"></textarea>
-        </fieldset>
-        <label class="visit-consent"><input id="visit-consent" type="checkbox" required><span>我同意将本次填写的信息用于来访预约。</span></label>
-        <button class="visit-primary" type="submit">下一步 · 接待人员验证</button>
-      </form>
-      <form id="visit-verify" hidden novalidate>
-        <div class="visit-card"><span class="visit-eyebrow">接待人员确认</span><h3>请向接待人员获取验证码</h3><p>请联系 <b id="visit-host-copy"></b>，获取其企业邮箱中的验证码。</p><p id="visit-email-copy" class="visit-email"></p><p></p>
-          <details class="visit-mail"><summary>查看验证码</summary><p>您的访客正在申请到访。本次验证码：</p><strong id="visit-demo-code"></strong><p>有效期5分钟；重新生成后旧码作废。</p></details>
-          <label for="visit-code">6位验证码</label><input id="visit-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="请输入接待人员提供的验证码" required>
-          <button id="visit-resend" class="visit-link" type="button">重新获取验证码</button>
-        </div>
-        <button class="visit-primary" type="submit">验证并生成访问码</button><button id="visit-back" class="visit-secondary" type="button">上一步 · 修改预约信息</button>
-      </form>
-      <div id="visit-result" hidden>
-        <article id="visit-ticket" class="visit-ticket"><span class="visit-eyebrow">TEMPORARY VISITOR PASS</span><h3>临时访问凭证</h3><p id="visit-validity" role="status"></p><div id="visit-qr" role="img" aria-label="访问二维码"></div><p class="visit-watermark">通行以园区确认为准</p><dl><dt>凭证编号</dt><dd id="visit-pass-id"></dd><dt>预约到访</dt><dd id="visit-pass-start"></dd><dt>预计离园</dt><dd id="visit-pass-end"></dd></dl><p>请在预约时间内到访。</p></article>
-        <div class="visit-actions"><button id="visit-download" class="visit-primary" type="button">保存二维码</button><button id="visit-print" class="visit-secondary" type="button">打印凭证</button></div>
-        <p class="visit-help">二维码可保存为 SVG 图片；打印前请检查打印预览。</p><button id="visit-new" class="visit-link" type="button">重新预约</button>
-      </div>
-      <p id="visit-status" class="visit-status" role="status" tabindex="-1"></p>`;
+
     window.__setMiniRoute('visitor','访客预约','home');
     var info=page.querySelector('#visit-info'),verify=page.querySelector('#visit-verify'),result=page.querySelector('#visit-result');
     var status=page.querySelector('#visit-status'),code=page.querySelector('#visit-code'),resend=page.querySelector('#visit-resend');
