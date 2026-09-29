@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+<title id="title">高端办公空间</title><desc id="desc">落地窗、深色木质会议桌和皮质座椅</desc>
+<rect width="640" height="420" fill="#d9e4e1"/><rect y="286" width="640" height="134" fill="#9b8068"/>
+<rect x="28" y="34" width="584" height="210" rx="8" fill="#b9d5d6" stroke="#f8fbfa" stroke-width="10"/>
+<path d="M170 34v210M320 34v210M470 34v210" stroke="#f8fbfa" stroke-width="8"/>
+<path d="M28 150h584" stroke="#f8fbfa" stroke-width="8"/><path d="M70 80h80v44H70zM365 72h76v52h-76zM510 170h72v44h-72z" fill="#f4faf8" opacity=".65"/>
+<ellipse cx="330" cy="315" rx="190" ry="34" fill="#573f36"/><rect x="185" y="306" width="290" height="22" rx="10" fill="#745849"/>
+<path d="M220 330v65M440 330v65" stroke="#4b3831" stroke-width="14"/><path d="M160 300v42M500 300v42" stroke="#4b3831" stroke-width="12"/>
+<rect x="66" y="252" width="34" height="104" rx="8" fill="#344c4d"/><circle cx="83" cy="226" r="43" fill="#477a66"/><circle cx="57" cy="235" r="26" fill="#5b9076"/><circle cx="110" cy="238" r="23" fill="#3d6f5d"/>
+</svg>

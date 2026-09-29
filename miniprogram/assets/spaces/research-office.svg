@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+<title id="title">研发办公空间</title><desc id="desc">成排工位、显示器和绿植</desc>
+<rect width="640" height="420" fill="#dae7e5"/><rect y="294" width="640" height="126" fill="#98afa9"/>
+<rect x="36" y="34" width="568" height="205" rx="8" fill="#b8d6dd" stroke="#f8ffff" stroke-width="10"/><path d="M178 34v205M320 34v205M462 34v205" stroke="#f8ffff" stroke-width="8"/>
+<rect x="74" y="266" width="160" height="20" rx="8" fill="#425f63"/><rect x="274" y="266" width="160" height="20" rx="8" fill="#425f63"/><rect x="474" y="266" width="100" height="20" rx="8" fill="#425f63"/>
+<path d="M92 286v94M214 286v94M292 286v94M414 286v94M494 286v94" stroke="#425f63" stroke-width="12"/>
+<rect x="114" y="235" width="52" height="32" rx="5" fill="#536e91"/><rect x="314" y="235" width="52" height="32" rx="5" fill="#536e91"/><rect x="500" y="235" width="48" height="32" rx="5" fill="#536e91"/>
+<rect x="30" y="326" width="25" height="61" rx="7" fill="#6e795b"/><circle cx="43" cy="306" r="35" fill="#5f986d"/><circle cx="583" cy="331" r="24" fill="#6f9e72"/>
+</svg>

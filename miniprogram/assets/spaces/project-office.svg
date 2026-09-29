@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+<title id="title">项目办公空间</title><desc id="desc">项目讨论桌、投影屏和协作座椅</desc>
+<rect width="640" height="420" fill="#e5e8df"/><rect y="290" width="640" height="130" fill="#b4a98f"/>
+<rect x="38" y="36" width="258" height="194" rx="8" fill="#c8e1dc" stroke="#fff" stroke-width="9"/><path d="M167 36v194M38 133h258" stroke="#fff" stroke-width="8"/>
+<rect x="356" y="52" width="228" height="130" rx="8" fill="#324d50"/><rect x="374" y="69" width="192" height="96" fill="#d7eee7"/><path d="M390 143l36-34 28 20 40-42 50 57" fill="none" stroke="#5b9a86" stroke-width="9"/>
+<ellipse cx="300" cy="315" rx="145" ry="42" fill="#705f4c"/><ellipse cx="300" cy="305" rx="130" ry="31" fill="#c69f72"/><path d="M300 347v47" stroke="#574839" stroke-width="16"/>
+<circle cx="165" cy="310" r="25" fill="#71919a"/><circle cx="430" cy="310" r="25" fill="#d17f68"/><circle cx="300" cy="374" r="25" fill="#7a9a75"/>
+</svg>
