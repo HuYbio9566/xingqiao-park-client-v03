@@ -16,7 +16,7 @@
 #visitor .visit-consent{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px;font-size:12px;line-height:1.7;color:var(--muted)}
 #visitor .visit-consent input{flex:none;width:18px;height:18px;margin-top:2px;accent-color:var(--visit-green)}
 #visitor button{font:inherit;cursor:pointer}
-#visitor .visit-primary,#visitor .visit-secondary{width:100%;min-height:44px;padding:12px;border:1px solid var(--visit-green);border-radius:10px;font-size:14px;font-weight:600}
+#visitor .visit-primary,#visitor .visit-secondary{width:100%;min-height:44px;padding:12px;border:1px solid var(--visit-green);border-radius:var(--r-control);font-size:14px;font-weight:600}
 #visitor .visit-primary{background:var(--visit-green);color:white}
 #visitor .visit-secondary{background:white;color:var(--visit-green);margin-top:10px}
 #visitor .visit-link{min-height:44px;padding:10px 0;border:0;background:transparent;color:var(--visit-green);font-size:12px}

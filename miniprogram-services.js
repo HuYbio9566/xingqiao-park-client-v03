@@ -233,7 +233,7 @@
   // 表单单选使用统一浮层；保留原 select 作为提交数据源。
   var selectStyle=node('style');
   selectStyle.textContent=`
-    .service-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:border-color .15s,box-shadow .15s}
+    .service-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-control);background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:border-color .15s,box-shadow .15s}
     .service-select-trigger:hover{border-color:var(--brand)}
     .service-select-trigger:focus-visible,.service-select-trigger[aria-expanded="true"]{outline:0;border-color:var(--brand);box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 20%,transparent)}
     .service-select-trigger:active{background:var(--soft)}
@@ -247,7 +247,7 @@
     .service-select-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
     .service-select-panel{position:fixed;z-index:1000;box-sizing:border-box;padding:8px;overflow-y:auto;border-radius:8px;background:var(--surface);box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .2s,transform .2s,visibility .2s}
     .service-select-panel.open{opacity:1;visibility:visible;transform:translateY(0)}
-    .service-select-option{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:0 0 2px;padding:5px 12px;border:0;border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:background-color .15s,color .15s}
+    .service-select-option{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:0 0 2px;padding:5px 12px;border:0;border-radius:var(--r-control);background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:background-color .15s,color .15s}
     .service-select-option:last-child{margin-bottom:0}
     .service-select-option:hover,.service-select-option:focus-visible,.service-select-option:active{outline:0;background:var(--soft)}
     .service-select-option[aria-selected="true"]{color:var(--brand);font-weight:600}
