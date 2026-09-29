@@ -72,12 +72,11 @@
 #home.home-new .home-new-top{order:1}
 #home.home-new .home-new-hero{order:2}
 #home.home-new .home-new-quick{order:3}
-#home.home-new .home-new-card:nth-of-type(4){order:5}
-#home.home-new .home-new-card:nth-of-type(5){order:9}
-#home.home-new .home-new-find{order:6}
-#home.home-new .home-new-card:nth-of-type(6){order:7}
-#home.home-new .home-new-card:nth-of-type(7){order:8}
-#home.home-new .home-new-card:nth-of-type(8){order:7}
+#home.home-new .home-new-card:has(> .home-new-notice-list){order:5}
+#home.home-new .home-new-card:has(> .home-new-events){order:6}
+#home.home-new .home-new-find{order:7}
+#home.home-new .home-new-card:has(> .home-new-service-grid){order:8}
+#home.home-new #home-featured-spaces{order:8}
 #home.home-new .enterprise-gpt-service-card button small{display:none}
 #home.home-new .home-new-quick button small{display:none}
 #home.home-new .home-new-quick .quick-icon{width:52px;height:52px;margin-left:auto;margin-right:auto}
@@ -92,14 +91,14 @@
 #home.home-new .home-new-park .park-triangle{width:8px;height:8px;display:block;flex:0 0 8px;order:1;transform:rotate(180deg)}
 #home.home-new .home-new-park b{font-size:12px;color:#28504a}
 #home.home-new .home-new-notice>i,#home.home-new .home-new-notice>svg{display:none}
-#home.home-new .home-new-card:nth-of-type(8) .home-new-head{align-items:center}
+#home.home-new #home-featured-spaces .home-new-head{align-items:center}
 #home.home-new .home-new-head{align-items:center}
 #home.home-new .home-new-head p{display:none}
 #home.home-new .home-new-quick{padding:8px 2px!important}
-#home.home-new .home-new-card:nth-of-type(8) .home-new-head h2{font-size:16px}
-#home.home-new .home-new-card:nth-of-type(4) .home-new-head h2,
-#home.home-new .home-new-card:nth-of-type(6) .home-new-head h2,
-#home.home-new .home-new-card:nth-of-type(7) .home-new-head h2{font-size:16px}
+#home.home-new #home-featured-spaces .home-new-head h2{font-size:16px}
+#home.home-new .home-new-card:has(> .home-new-events) .home-new-head h2,
+#home.home-new .home-new-card:has(> .home-new-service-grid) .home-new-head h2,
+#home.home-new .home-new-card:has(> .home-new-notice-list) .home-new-head h2{font-size:16px}
 #enterprise-services .enterprise-gpt-news b{font-size:14px}
 #enterprise-services .enterprise-gpt-news small{font-size:12px}
 #home.home-new .home-new-notice{grid-template-columns:44px 1fr;min-height:64px}
