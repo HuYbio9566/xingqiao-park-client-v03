@@ -1,0 +1,16 @@
+<!-- Based on Lucide icon geometry (ISC); white relief on a colored gradient tile. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="tile" x1="6" y1="0" x2="42" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#4ed0dc"/><stop offset="1" stop-color="#1899b8"/></linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(12 5) rotate(55) scale(39 34)" gradientUnits="userSpaceOnUse"><stop stop-color="white" stop-opacity=".28"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient>
+    <linearGradient id="porcelain" x1="7" y1="3" x2="18" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset=".5" stop-color="white" stop-opacity=".96"/><stop offset="1" stop-color="white" stop-opacity=".74"/></linearGradient>
+    <filter id="relief" x="-40%" y="-40%" width="180%" height="190%" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="1.2" stdDeviation=".8" flood-color="#1899b8" flood-opacity=".45"/></filter>
+  </defs>
+  <rect width="48" height="48" rx="14" fill="url(#tile)"/>
+  <rect width="48" height="48" rx="14" fill="url(#glow)"/>
+  <rect x=".5" y=".5" width="47" height="47" rx="13.5" stroke="white" stroke-opacity=".22"/>
+  <g transform="translate(9 9) scale(1.25)" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="url(#porcelain)" stroke="white" stroke-opacity=".7" stroke-width=".6" filter="url(#relief)"><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326Z"/></g>
+    <g stroke="#1899b8" stroke-opacity=".72" stroke-width="1.6"><path d="M10.268 21a2 2 0 0 0 3.464 0"/></g>
+  </g>
+</svg>

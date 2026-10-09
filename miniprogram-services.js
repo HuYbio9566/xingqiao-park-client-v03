@@ -92,6 +92,8 @@
     if(entries[kind])list.append(button(kind==='visitors'?'登记访客':'填写报修',function(){go(entries[kind])},'primary-button'));
     else if(kind==='consultations')list.append(button('新增咨询留言',openContact,'primary-button'));
     else list.append(button('填写反馈',function(){go('feedback')},'primary-button'));
+    var count=document.querySelector('.profile-stats [data-page="'+pages[kind]+'"] b');
+    if(count){count.textContent=records.length;count.title='记录数量'}
   }
   function renderAll(){Object.keys(names).forEach(render)}
   var modal=document.getElementById('contact-modal'),contactButton=document.getElementById('contact-submit');
@@ -107,6 +109,7 @@
     contactStatus.textContent='';contactConsent.checked=false;
     modal.classList.remove('hidden');document.getElementById('contact-name').focus();
   }
+  document.getElementById('home-consult-open').onclick=openContact;
   document.getElementById('space-contact-open').onclick=openContact;
   modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','保存咨询留言');
   function closeContact(){modal.classList.add('hidden');if(contactOpener)contactOpener.focus()}
@@ -155,8 +158,17 @@
     if(!feedbackConsent.checked)return message(feedbackStatus,'请先同意保存信息。',feedbackConsent);
     if(save('feedback',{title:feedbackType.value||'意见反馈',fields:[['反馈内容',feedbackNote.value.trim()],['联系电话',feedbackPhone.value.trim()]]},feedbackStatus)){feedbackNote.value='';feedbackPhone.value='';feedbackConsent.checked=false;feedbackStatus.textContent=''}
   };
-  var profile=document.getElementById('profile');
-  profile.querySelectorAll('[data-profile-entry]').forEach(function(row){
+  var profile=document.getElementById('profile'),login=profile.querySelector('.profile-login');
+  var identity=profile.querySelector('.profile-identity');
+  if(identity){
+  identity.querySelector('span').textContent='查看预约与服务记录';
+  login.textContent='访客身份';
+  login.onclick=function(){
+    var identityPage=section('local-identity');identityPage.replaceChildren(node('h2','访客身份'),node('p','当前以访客身份使用园区服务。','service-notice'),button('返回我的',function(){go('profile')},'primary-button'));
+    go(identityPage.id,'身份信息');
+  };
+  }
+  profile.querySelectorAll('.profile-menu-row,[data-profile-entry]').forEach(function(row){
     var label=row.dataset.profileEntry||row.querySelector('b').textContent;
     if(label==='园区咨询'||label==='空间咨询'){
       row.removeAttribute('data-profile-notice');
@@ -175,17 +187,75 @@
       go(privacy.id,'隐私与授权');
     };
   });
+  if(identity)['consultations','feedback'].forEach(function(kind){
+    var row=button('',function(){go(pages[kind],names[kind])},'profile-menu-row');
+    var copy=node('span',undefined,'profile-menu-copy');copy.append(node('b',names[kind]),node('small','查看历史记录'));row.appendChild(copy);profile.querySelectorAll('.profile-menu')[1].appendChild(row);
+  });
+  // v2：导航找服务，首页发起办理，个人中心查询记录。
+  document.documentElement.dataset.productVersion='2.0.0';
+  var home=document.getElementById('home'),grid=home.querySelector('.service-grid');
+  var shortcuts=[['meeting','会议室'],['visitor','访客登记'],['repair','物业报修'],['vehicle','车辆服务'],['feedback','投诉建议']];
+  grid.querySelectorAll('.service-item').forEach(function(item){
+    if(!shortcuts.some(function(entry){return entry[0]===item.dataset.page}))item.remove();
+  });
+  shortcuts.forEach(function(entry){
+    var item=grid.querySelector('[data-page="'+entry[0]+'"]');
+    Array.from(item.childNodes).filter(function(child){return child.nodeType===3}).forEach(function(child){child.remove()});
+    item.append(document.createTextNode(entry[1]));
+    grid.appendChild(item);
+  });
+  var servicesCard=node('div',undefined,'v2-services-card');
+  grid.before(servicesCard);
+  servicesCard.append(grid);
+
+  var menus=profile.querySelectorAll('.profile-menu');
+  if(menus.length){
+  menus[0].querySelectorAll('.profile-menu-row').forEach(function(row){
+    if(row.dataset.page!=='vehicle'){row.remove();return}
+    row.querySelector('b').textContent='我的车辆';
+    row.querySelector('small').textContent='车辆与停车服务 · 暂未开通';
+  });
+  menus[1].querySelectorAll('.profile-menu-row').forEach(function(row){
+    var label=row.querySelector('b').textContent;
+    if(row.dataset.page==='notices'||label==='园区咨询'){row.remove();return}
+    if(label===names.consultations||label===names.feedback){
+      row.querySelector('b').textContent=label===names.consultations?'我的咨询':'我的反馈';
+      var icon=node('span',undefined,'profile-menu-icon green'),glyph=node('i');
+      glyph.setAttribute('data-lucide',label===names.consultations?'message-circle':'message-square');
+      icon.appendChild(glyph);icon.setAttribute('aria-hidden','true');
+      var arrow=node('i');arrow.setAttribute('data-lucide','chevron-right');arrow.setAttribute('aria-hidden','true');
+      row.prepend(icon);row.appendChild(arrow);menus[0].appendChild(row);
+    }
+  });
+  profile.querySelectorAll('.profile-section-title')[0].textContent='我的记录';
+  profile.querySelectorAll('.profile-section-title')[1].textContent='隐私与设置';
+  profile.querySelector('.profile-stats [data-page="repair-records"] span').textContent='报修记录';
+  var version=node('p','当前版本 v2.0.0','v2-version');
+  profile.appendChild(version);
+  }
+
   var bookingsButton=document.querySelector('#meeting .my-bookings-button');
   var meetingHeading=document.querySelector('#meeting .meeting-results > .field-title');
   meetingHeading.querySelector('.muted').remove();
   bookingsButton.remove();
-  var serviceStyle=node('style');
-  serviceStyle.textContent=`
+  var v2Style=node('style');
+  v2Style.textContent=`
     .phone>.navbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.5px;background:#f0f2f0;pointer-events:none}
-    .screen #meeting{padding-bottom:24px}
-    .screen #meeting::after{content:none}
+    #home .facts{height:68.9px;padding:8px;align-items:center}
+    #home .facts>div{position:relative;padding:0;border-left:0;text-align:center}
+    #home .facts>div+div::before{content:"";position:absolute;left:0;top:0;bottom:0;width:.5px;background:var(--line)}
+    #home .v2-services-card{border-radius:var(--r-md);background:var(--surface);box-shadow:var(--shadow)}
+    #home .service-grid{align-items:start;background:transparent;box-shadow:none}
+    #home .v2-services-card .service-grid{margin-top:-8px;margin-bottom:-8px}
+    #home .service-item{min-height:66px}
+    #home .service-block{margin-bottom:24px}
+    html[data-product-version="2.0.0"] .screen #meeting{padding-bottom:24px}
+    html[data-product-version="2.0.0"] .screen #meeting::after{content:none}
+    #meeting .my-bookings-button{position:static;display:inline-flex;align-items:center;width:auto;min-height:44px;height:auto;padding:0 4px;border:0;background:transparent;color:var(--brand);font-size:13px;font-weight:500}
+    .v2-version{margin:16px 0;color:var(--muted);font-size:12px;text-align:center}
+    #meeting .my-bookings-button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
   `;
-  document.head.appendChild(serviceStyle);
+  document.head.appendChild(v2Style);
   ['vehicle','restaurant'].forEach(function(id){
     var page=document.getElementById(id);
     var feedbackLine=status(page);
@@ -233,7 +303,7 @@
   // 表单单选使用统一浮层；保留原 select 作为提交数据源。
   var selectStyle=node('style');
   selectStyle.textContent=`
-    .service-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-control);background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:border-color .15s,box-shadow .15s}
+    .service-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:border-color .15s,box-shadow .15s}
     .service-select-trigger:hover{border-color:var(--brand)}
     .service-select-trigger:focus-visible,.service-select-trigger[aria-expanded="true"]{outline:0;border-color:var(--brand);box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 20%,transparent)}
     .service-select-trigger:active{background:var(--soft)}
@@ -247,7 +317,7 @@
     .service-select-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
     .service-select-panel{position:fixed;z-index:1000;box-sizing:border-box;padding:8px;overflow-y:auto;border-radius:8px;background:var(--surface);box-shadow:var(--shadow);opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .2s,transform .2s,visibility .2s}
     .service-select-panel.open{opacity:1;visibility:visible;transform:translateY(0)}
-    .service-select-option{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:0 0 2px;padding:5px 12px;border:0;border-radius:var(--r-control);background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:background-color .15s,color .15s}
+    .service-select-option{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:0 0 2px;padding:5px 12px;border:0;border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:14px;text-align:left;transition:background-color .15s,color .15s}
     .service-select-option:last-child{margin-bottom:0}
     .service-select-option:hover,.service-select-option:focus-visible,.service-select-option:active{outline:0;background:var(--soft)}
     .service-select-option[aria-selected="true"]{color:var(--brand);font-weight:600}
