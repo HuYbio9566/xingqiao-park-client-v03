@@ -125,7 +125,6 @@
     contactStatus.textContent='';contactConsent.checked=false;
     modal.classList.remove('hidden');document.getElementById('contact-name').focus();
   }
-  document.getElementById('home-consult-open').onclick=openContact;
   document.getElementById('space-contact-open').onclick=openContact;
   modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','保存咨询留言');
   function closeContact(){modal.classList.add('hidden');if(contactOpener)contactOpener.focus()}
@@ -209,20 +208,7 @@
   });
   // v2：导航找服务，首页发起办理，个人中心查询记录。
   document.documentElement.dataset.productVersion='2.0.0';
-  var home=document.getElementById('home'),grid=home.querySelector('.service-grid');
-  var shortcuts=[['meeting','会议室'],['visitor','访客登记'],['repair','物业报修'],['vehicle','车辆服务'],['feedback','投诉建议']];
-  grid.querySelectorAll('.service-item').forEach(function(item){
-    if(!shortcuts.some(function(entry){return entry[0]===item.dataset.page}))item.remove();
-  });
-  shortcuts.forEach(function(entry){
-    var item=grid.querySelector('[data-page="'+entry[0]+'"]');
-    Array.from(item.childNodes).filter(function(child){return child.nodeType===3}).forEach(function(child){child.remove()});
-    item.append(document.createTextNode(entry[1]));
-    grid.appendChild(item);
-  });
-  var servicesCard=node('div',undefined,'v2-services-card');
-  grid.before(servicesCard);
-  servicesCard.append(grid);
+  // 首页快捷区已由页面静态标记直接渲染（2026-10-18 清理旧首页后不再运行时重排）。
 
   var menus=profile.querySelectorAll('.profile-menu');
   if(menus.length){
@@ -257,14 +243,6 @@
   var v2Style=node('style');
   v2Style.textContent=`
     .phone>.navbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.5px;background:#f0f2f0;pointer-events:none}
-    #home .facts{height:68.9px;padding:8px;align-items:center}
-    #home .facts>div{position:relative;padding:0;border-left:0;text-align:center}
-    #home .facts>div+div::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--divider-width);background:var(--line)}
-    #home .v2-services-card{border-radius:var(--r-md);background:var(--surface);box-shadow:var(--shadow)}
-    #home .service-grid{align-items:start;background:transparent;box-shadow:none}
-    #home .v2-services-card .service-grid{margin-top:-8px;margin-bottom:-8px}
-    #home .service-item{min-height:66px}
-    #home .service-block{margin-bottom:24px}
     html[data-product-version="2.0.0"] .screen #meeting{padding-bottom:24px}
     html[data-product-version="2.0.0"] .screen #meeting::after{content:none}
     #meeting .my-bookings-button{position:static;display:inline-flex;align-items:center;width:auto;min-height:44px;height:auto;padding:0 4px;border:0;background:transparent;color:var(--brand);font-size:13px;font-weight:500}
