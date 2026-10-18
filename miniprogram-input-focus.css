@@ -1,0 +1,12 @@
+/* Form focus changes only the existing border; never adds a second ring. */
+.phone{--input-focus-border:var(--brand)}
+.phone :is(input:where(:not([type="checkbox"],[type="radio"],[type="file"],[type="hidden"],[type="button"],[type="submit"],[type="reset"])),textarea,select,.quick-date-trigger,.mini-date-trigger,.journey-select-trigger,.service-select-trigger,.visit-date-trigger):is(:focus,:focus-visible),
+.phone #smart-service textarea:is(:focus,:focus-visible),
+.phone #property-workbench-fee-detail .fee-status-form textarea:is(:focus,:focus-visible),
+.phone :is(.quick-date-trigger,.mini-date-trigger,.journey-select-trigger,.service-select-trigger,.visit-date-trigger)[aria-expanded="true"]{
+  border-color:var(--input-focus-border);
+  outline:none;
+  outline-offset:0;
+  box-shadow:none;
+}
+.phone :is(.space-search-field,.space-finder-search):focus-within{border-color:var(--input-focus-border)}

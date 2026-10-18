@@ -1,0 +1,23 @@
+/* Property inbox uses the same notice, dialogue and smart-entry styles as employees. */
+.property-local-note{margin:0;padding:12px var(--page-gutter,16px);background:var(--soft);color:var(--brand);font-size:12px;line-height:20px}
+.screen .property-service-chat{padding:0}
+.property-service-chat .chat-agent-copy strong{font-size:16px}
+.property-service-chat .chat-agent-copy p{line-height:18px;overflow-wrap:anywhere}
+.property-service-chat .property-send-state{display:block;margin-top:8px;text-align:right;color:var(--brand);font-size:12px;line-height:18px}
+.property-service-chat .chat-message-meta{color:var(--muted)}
+.property-service-chat textarea{box-sizing:border-box;min-width:0;height:44px;min-height:44px;max-height:44px;resize:none}
+.property-service-chat .chat-status{font-size:12px;line-height:20px}
+.property-service-chat button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.property-service-chat .chat-send{box-sizing:border-box;height:44px;min-height:44px;white-space:nowrap}
+.property-service-chat .chat-composer{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.property-service-chat .chat-input-row{align-items:center}
+.property-service-chat .chat-image-input,.property-service-chat .property-image-preview[hidden]{display:none}
+.property-service-chat .property-image-preview{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px;background:var(--soft);border-radius:8px}
+.property-service-chat .property-image-preview img{width:56px;height:56px;object-fit:cover;border-radius:6px}
+.property-service-chat .property-image-preview span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.property-service-chat .property-image-preview button{min-height:44px;padding:0 8px;border:0;background:none;color:var(--brand);font-size:12px}
+.leasing-chat .chat-message-image{display:block;max-width:100%;width:220px;max-height:240px;object-fit:contain;border-radius:8px}
+.leasing-chat .chat-bubble .chat-message-image:not(:first-child){margin-top:8px}
+@media(max-width:360px){.property-service-chat .chat-input-row{gap:8px}}
+/* Inbox text avatars match the in-chat avatar (brand fill, white initial). */
+#messages .property-leasing-list .message-avatar-person{background:var(--brand);color:#fff}

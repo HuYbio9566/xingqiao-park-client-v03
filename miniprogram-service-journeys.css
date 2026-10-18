@@ -1,0 +1,149 @@
+.journey-page{padding:18px 16px 28px;background:var(--bg)}
+.journey-page>h1{margin:0;font-size:22px;line-height:1.4}
+.journey-copy{margin:8px 0 14px;color:var(--muted);font-size:14px;line-height:1.6}
+.journey-notice{position:sticky;top:0;z-index:3;display:flex;align-items:center;height:36px;margin:-18px -16px 14px;padding:0 0 0 16px;background:#fff8e1;color:#c98a00;font-size:12px;overflow:hidden}
+.journey-notice-track{flex:1;min-width:0;overflow:hidden;white-space:nowrap}
+.journey-notice .journey-copy{display:inline-block;margin:0;padding-left:100%;color:inherit;font-size:12px;line-height:36px;animation:journey-notice-scroll 14s linear infinite}
+.journey-notice-close{flex:0 0 36px;height:36px;padding:0;border:0;background:transparent;color:inherit;font-size:16px;line-height:36px;cursor:pointer}
+@keyframes journey-notice-scroll{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.journey-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:44px;margin:-18px -16px 12px;background:#fff;border-bottom:var(--divider-width,1px) solid var(--line)}
+.journey-notice+.journey-tabs{margin-top:-14px}
+.screen section.journey-page-split{padding:0;gap:0}
+.journey-page-split>.journey-notice,.journey-page-split>.journey-tabs{margin:0}
+.journey-page-split>.journey-page-body{padding:16px}
+.journey-tabs button{position:relative;min-width:0;height:44px;padding:0;border:0;background:transparent;color:var(--muted);font-size:14px;cursor:pointer}
+.journey-tabs button[aria-selected=true]{color:var(--brand);font-weight:600}
+.journey-tabs button[aria-selected=true]:after{content:"";position:absolute;bottom:0;left:calc(50% - 12px);width:24px;height:3px;border-radius:2px;background:var(--brand)}
+.journey-tab-panel>h2:first-child{margin-top:4px}
+.journey-modal{position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end;background:rgba(17,24,20,.45)}
+.journey-modal .journey-modal-sheet{width:100%;max-height:85%;margin:0;padding:12px 16px 24px;overflow:auto;border:0;border-radius:16px 16px 0 0;background:var(--surface,#fff)}
+.journey-modal-head{display:flex;align-items:center;justify-content:space-between}
+.journey-modal-head h2{margin:0;font-size:16px}
+.journey-modal-close{width:32px;height:32px;padding:0;border:0;background:transparent;color:var(--muted);font-size:22px;line-height:32px;cursor:pointer}
+.journey-pay-qr{display:flex;justify-content:center;padding:6px 0}
+.journey-pay-qr img{width:168px;height:168px;image-rendering:pixelated}
+.journey-pay-note{margin:12px 0 8px;text-align:center;color:var(--muted);font-size:12px}
+.journey-check-row{display:flex;align-items:center;gap:8px;height:40px;margin-top:8px;font-size:14px;cursor:pointer}
+.journey-check-row input{width:16px;height:16px;margin:0}
+.journey-pay-actions{flex-wrap:nowrap}
+.journey-pay-actions button{flex:1 1 0;min-width:0;height:40px;min-height:40px;padding-top:0;padding-bottom:0}
+@media (prefers-reduced-motion:reduce){.journey-notice .journey-copy{padding-left:0;animation:none;text-overflow:ellipsis}}
+.journey-page>h2,.journey-page-body>h2,.journey-workbench-extension>h2{margin:20px 0 12px;font-size:16px;line-height:1.4}
+.journey-card{margin:12px 0;padding:14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);box-shadow:var(--shadow)}
+.journey-card .role-row{align-items:flex-start;gap:12px}
+.journey-card .role-row strong{min-width:0;overflow-wrap:anywhere}
+.journey-card .role-status{flex:0 0 auto}
+.journey-status-warning{color:var(--accent,#b56a16)!important}
+.journey-detail-back{display:block;margin:0 0 8px;padding:0;border:0;background:none;color:var(--brand);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.journey-vehicle-payment{margin:12px 0;padding:14px;border:1px solid #ead8b8;border-radius:var(--r-md);background:#fffaf0;box-shadow:none}
+.journey-vehicle-payment .journey-actions{margin-bottom:0}
+.journey-card>p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.journey-fields{display:grid;grid-template-columns:88px minmax(0,1fr);gap:8px 12px;margin:12px 0 0;font-size:12px;line-height:1.5}
+.journey-fields dt{color:var(--muted)}
+.journey-fields dd{margin:0;min-width:0;overflow-wrap:anywhere;color:var(--text)}
+.journey-history{border-top:1px solid var(--line);padding-top:8px!important;font-size:12px!important}
+.journey-form-panel{padding:14px}
+.journey-form-panel h2{margin:0;font-size:16px}
+.journey-field{display:block;margin-top:12px;color:var(--text);font-size:14px;font-weight:600}
+.journey-field input,.journey-field textarea,.journey-field select{display:block;width:100%;min-height:40px;margin-top:8px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font:inherit;font-size:14px;line-height:1.5}
+.journey-field textarea{min-height:80px;resize:vertical}
+.journey-time-range{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.journey-time-picker .space-picker-panel{padding:0 16px calc(24px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0}
+.journey-time-picker header{display:grid;grid-template-columns:56px 1fr 56px;align-items:center;padding:18px 4px 14px;margin:0}
+.journey-time-picker header h2{margin:0;text-align:center;font-size:17px}
+.journey-time-picker header button{min-height:44px;padding:0;border:0;background:none;color:var(--brand);font:inherit;font-size:16px}
+.journey-time-picker header .space-picker-cancel{text-align:left}
+.journey-time-picker header .journey-time-done{text-align:right;font-weight:600}
+.journey-time-wheels{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:220px;font-variant-numeric:tabular-nums}
+.journey-time-wheels::before{content:"";position:absolute;inset:88px 8px;pointer-events:none;border-radius:10px;background:var(--soft)}
+.journey-time-wheel{position:relative;width:88px;height:220px;padding-block:88px;box-sizing:border-box;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:none;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(transparent,#000 35%,#000 65%,transparent)}
+.journey-time-wheel::-webkit-scrollbar{display:none}
+.journey-time-wheel:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:10px}
+.journey-time-tick{height:44px;line-height:44px;scroll-snap-align:center;color:var(--muted);text-align:center;font-size:26px;cursor:pointer;user-select:none}
+.journey-time-tick.is-selected{color:var(--text);font-weight:600}
+.journey-time-wheel.is-locked{overflow-y:hidden}
+.journey-time-wheel.is-locked .journey-time-tick:not(.is-selected){visibility:hidden}
+.journey-time-unit{position:relative;color:var(--text);font-size:15px;margin-right:12px}
+/* Mobile select trigger: same box as inputs, 16px chevron with 12px right inset; opens a bottom sheet. */
+.journey-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:40px;margin-top:8px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font:inherit;font-size:14px;font-weight:400;text-align:left;cursor:pointer}
+.journey-select-trigger span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.journey-field select[hidden]{display:none}
+.journey-select-trigger svg{flex:none;width:16px;height:16px;color:var(--muted);transition:transform .15s}
+.journey-select-trigger[aria-expanded=true] svg{transform:rotate(180deg)}
+.journey-picker{z-index:96}
+@media(prefers-reduced-motion:reduce){.journey-select-trigger svg{transition:none}}
+.journey-actions{margin-top:12px}
+.journey-actions button{min-height:40px;border-radius:var(--r-md);font-size:14px}
+.journey-actions.journey-block-actions{margin:12px 0}
+.role-workflow>.journey-block-actions{margin:0}
+/* A trailing full-width action bar adds no extra bottom gap; the body's 16px padding is the only gap. */
+.journey-actions.journey-block-actions:last-child{margin-bottom:0}
+/* Form cards inside the split body: 16px visible gap on every side (15px padding + 1px border); first/last field drop their outer margin. */
+.journey-page-body>form.role-panel{padding:15px}
+.journey-page-body>form.role-panel>label:first-child{margin-top:0}
+.journey-page-body>form.role-panel>label:nth-last-child(2):has(+ .role-feedback:empty),.journey-page-body>form.role-panel>label:last-child{margin-bottom:0}
+.journey-block-actions button{flex:1 1 100%;width:100%;height:44px;min-height:44px;padding:0 16px;font-size:16px}
+.journey-feedback{margin:8px 0 0!important;color:var(--accent)!important;font-size:12px!important}
+.journey-empty{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:120px;margin:12px 0;padding:0 16px;border:1px dashed #cfd8d3;border-radius:var(--r-md);background:rgba(255,255,255,.6);color:var(--muted);font-size:14px;line-height:20px;text-align:center}
+.journey-warning{color:var(--accent)!important}
+.journey-activity-actions{display:flex;gap:8px;margin-top:18px;padding-top:14px;border-top:var(--divider-width) solid var(--line)}
+.journey-activity-actions button{width:100%;min-height:44px;border:0;border-radius:var(--r-md);font-size:16px;background:var(--brand);color:#fff;font-weight:600}
+.journey-workbench-extension{margin:18px 0;padding:14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.journey-workbench-extension .journey-card{margin:12px 0;padding:12px;box-shadow:none}
+.journey-workbench-extension .journey-card:last-child{margin-bottom:0}
+@media(max-width:360px){.journey-fields{grid-template-columns:76px minmax(0,1fr)}.journey-page{padding-left:14px;padding-right:14px}}
+.journey-confirm{position:absolute;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:0 32px;background:rgba(17,24,20,.45)}
+.journey-confirm-box{width:100%;max-width:300px;padding:24px 20px 16px;border-radius:16px;background:var(--surface,#fff);text-align:center}
+.journey-confirm-box h2{margin:0;color:var(--text);font-size:16px;font-weight:600}
+.journey-confirm-box p{margin:8px 0 20px;color:var(--muted);font-size:14px;line-height:1.5}
+.journey-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.journey-confirm-actions button{height:40px;border:1px solid var(--line);border-radius:var(--r-sm,8px);background:var(--soft);color:var(--brand);font:inherit;font-size:14px;cursor:pointer}
+.journey-confirm-actions .journey-confirm-danger{border-color:var(--brand);background:var(--brand);color:#fff}
+.journey-toast{position:absolute;left:50%;top:50%;z-index:130;max-width:80%;padding:10px 16px;border-radius:8px;background:rgba(24,36,31,.86);color:#fff;font-size:14px;line-height:1.5;text-align:center;transform:translate(-50%,-50%);pointer-events:none}
+.journey-toast[hidden]{display:none}
+/* 订餐服务：今日菜单列表 */
+.journey-menu-head{display:flex;align-items:center;justify-content:space-between;height:24px;margin:0 0 8px}
+.journey-menu-head h2{margin:0;font-size:16px;line-height:1.4}
+.journey-menu-head span{color:var(--muted);font-size:12px}
+.journey-menu{margin:0;padding:0;list-style:none;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface,#fff);overflow:hidden}
+.journey-dish{display:flex;align-items:center;gap:12px;padding:12px}
+.journey-dish+.journey-dish{border-top:var(--divider-width,1px) solid var(--line)}
+.journey-dish-art{display:block;flex:none;width:72px;height:72px;border-radius:12px;background:#f3efe7;object-fit:cover}
+.journey-dish-info{display:grid;flex:1;min-width:0;gap:2px}
+.journey-dish-info strong{overflow:hidden;color:var(--text);font-size:15px;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.journey-dish-info span{overflow:hidden;color:var(--muted);font-size:12px;line-height:1.5;text-overflow:ellipsis;white-space:nowrap}
+.journey-dish-info b{color:#d4572a;font-size:15px;line-height:1.4}
+.journey-dish-pick{flex:none;height:32px;padding:0 12px;border:0;border-radius:8px;background:var(--brand);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.journey-dish-pick:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.journey-menu-tip{margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+/* Employee venue booking: notice bar above the room filters. */
+#meeting>.journey-notice{position:sticky;top:0;margin:0}
+/* Meeting application sheet: stacked label + control, same tokens as other forms. */
+.journey-modal .meeting-apply-sheet{box-sizing:border-box;padding:18px 16px 20px;border-radius:18px 18px 0 0;background:var(--bg);box-shadow:0 -8px 30px rgba(27,54,42,.18)}
+.meeting-apply-sheet .journey-modal-head h2{font-size:18px}
+.meeting-apply-sheet>.form-card{margin-top:16px;padding:4px 14px;background:#fff;border-radius:var(--r-md);overflow:hidden}
+.meeting-apply-sheet>.form-card>.journey-copy{margin:10px 0 14px}
+.meeting-apply-sheet label{display:grid;gap:8px;margin:12px 0;color:var(--text);font-size:14px;font-weight:600}
+.meeting-apply-sheet input,.meeting-apply-sheet textarea{width:100%;box-sizing:border-box;min-height:44px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface,#fff);color:var(--text);font:inherit;font-size:14px;font-weight:400}
+.meeting-apply-sheet textarea{min-height:96px;resize:vertical}
+.meeting-apply-sheet .meeting-apply-time-field{margin:12px 0}
+.meeting-apply-sheet .meeting-apply-time-field>p{margin:0;color:var(--text);font-size:14px;font-weight:600}
+.meeting-apply-sheet .meeting-apply-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.meeting-apply-sheet .meeting-apply-slot{height:40px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:13px;cursor:pointer}
+.meeting-apply-sheet .meeting-apply-slot.selected{border-color:var(--brand);background:var(--soft);color:var(--brand);font-weight:600}
+.meeting-apply-sheet .role-feedback{margin:8px 0 0;color:#96530d;font-size:12px}
+.meeting-apply-sheet .role-feedback:empty{display:none}
+#meeting .meeting-quick-open.meeting-apply-open{width:auto;padding:0 12px;border-radius:12px;font-size:14px;white-space:nowrap}
+
+.journey-empty[hidden]{display:none!important}
+
+/* Vehicle card inline action bar: two equal-width tertiary buttons */
+.journey-vehicle-card-actions{margin-top:12px;gap:8px}
+.journey-vehicle-card-actions button{flex:1 1 0;min-width:0;min-height:40px;height:40px;padding:0 8px;border:1px solid var(--line);border-radius:var(--r-md);background:#fff;color:var(--text);font-size:14px;white-space:nowrap}
+/* Vehicle bind/edit sheets: 44px controls and a full-width submit. */
+.journey-vehicle-sheet .journey-field input{box-sizing:border-box;height:44px;min-height:44px;line-height:44px}
+.journey-vehicle-sheet .journey-select-trigger{box-sizing:border-box;height:44px;min-height:44px;line-height:1}
+.journey-vehicle-sheet .journey-actions{display:flex}
+.journey-vehicle-sheet .journey-actions button{flex:1 1 0;min-width:0;width:0;height:44px;min-height:44px;padding:0 8px;font-size:15px}
+.journey-check-row.journey-check-outside{margin:12px 0 0;font-weight:400;color:var(--text)}
+.journey-check-outside+.journey-block-actions{margin-top:12px}

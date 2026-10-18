@@ -1,45 +1,82 @@
 #visitor{--visit-green:var(--brand,#25855a);padding-top:0}
 #visitor [hidden]{display:none!important}
-#visitor .visit-eyebrow{font-size:10px;letter-spacing:1.5px;color:var(--visit-green)}
+#visitor .visit-eyebrow{font-size:12px;letter-spacing:1.5px;color:var(--visit-green)}
 #visitor .visit-steps{display:flex;list-style:none;padding:0;margin:0 -16px 16px;gap:4px;background:#fff}
-#visitor .visit-steps li{flex:1;min-width:0;font-size:12px;padding:10px 2px;border-bottom:3px solid #e1e8e3;color:var(--muted);white-space:nowrap;text-align:center}
+#visitor .visit-steps li{flex:1;min-width:0;font-size:12px;padding:12px 4px;border-bottom:2px solid #e1e8e3;color:var(--muted);white-space:nowrap;text-align:center}
 #visitor .visit-steps li[aria-current],#visitor .visit-steps li.is-done{border-color:var(--visit-green);color:var(--visit-green)}
 #visitor .visit-steps li[aria-current]{font-weight:700}
 #visitor fieldset,#visitor .visit-card{min-width:0;margin:0 0 18px;padding:16px;border:1px solid var(--line,#e0e7e2);border-radius:14px;background:#fff}
-#visitor legend{font-size:13px;font-weight:700;color:var(--visit-green);padding:0 8px}
-#visitor form label:not(.visit-consent){display:block;font-size:13px;font-weight:600;margin:12px 0 8px}
-#visitor form input:not([type=checkbox]),#visitor form textarea{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:44px;border:1px solid #dce4df;border-radius:8px;background:#fafcfb;padding:11px 10px;font:inherit;font-size:14px;color:var(--text)}
+#visitor legend{font-size:14px;font-weight:700;color:var(--visit-green);padding:0 8px}
+#visitor form label:not(.visit-consent){display:block;font-size:14px;font-weight:600;margin:12px 0 8px}
+#visitor form input:not([type=checkbox]),#visitor form textarea{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:44px;border:1px solid #dce4df;border-radius:8px;background:#fafcfb;padding:12px;font:inherit;font-size:14px;color:var(--text)}
 #visitor form textarea{resize:vertical;line-height:1.6}
 #visitor small,#visitor .visit-card p,#visitor .visit-help{display:block;font-size:12px;line-height:1.7;color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
-#visitor .visit-card h3{font-size:19px;margin:12px 0}
+#visitor .visit-card h3{font-size:20px;margin:12px 0}
 #visitor .visit-email{color:var(--visit-green)!important;font-weight:600}
 #visitor .visit-consent{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px;font-size:12px;line-height:1.7;color:var(--muted)}
 #visitor .visit-consent input{flex:none;width:18px;height:18px;margin-top:2px;accent-color:var(--visit-green)}
 #visitor button{font:inherit;cursor:pointer}
-#visitor .visit-primary,#visitor .visit-secondary{width:100%;min-height:44px;padding:12px;border:1px solid var(--visit-green);border-radius:10px;font-size:14px;font-weight:600}
+#visitor .visit-primary,#visitor .visit-secondary{width:100%;height:44px;min-height:44px;padding:0 12px;border:1px solid var(--visit-green);border-radius:12px;font-size:16px;font-weight:600}
 #visitor .visit-primary{background:var(--visit-green);color:white}
-#visitor .visit-secondary{background:white;color:var(--visit-green);margin-top:10px}
-#visitor .visit-link{min-height:44px;padding:10px 0;border:0;background:transparent;color:var(--visit-green);font-size:12px}
+#visitor .visit-secondary{background:white;color:var(--visit-green);margin-top:12px}
+#visitor .visit-link{min-height:44px;padding:12px 0;border:0;background:transparent;color:var(--visit-green);font-size:12px}
 #visitor button:disabled{opacity:.5;cursor:default}
-#visitor :is(button,input,textarea,summary):focus-visible{outline:2px solid var(--visit-green);outline-offset:3px}
-#visitor form input:not([type=checkbox]):focus,#visitor form textarea:focus{border-color:var(--visit-green);outline:none;outline-offset:0}
-#visitor .visit-mail{background:#f1f6f3;border-radius:10px;padding:12px;margin:18px 0;font-size:12px}
+#visitor :is(button:not(.visit-date-trigger),input[type=checkbox],input[type=radio],summary):focus-visible{outline:2px solid var(--visit-green);outline-offset:3px}
+#visitor form input:not([type=checkbox]):focus,#visitor form textarea:focus,#visitor .visit-date-trigger:is(:focus,:focus-visible,[aria-expanded="true"]){border-color:var(--input-focus-border);outline:none;outline-offset:0;box-shadow:none}
+#visitor .visit-mail{background:#f1f6f3;border-radius:12px;padding:12px;margin:18px 0;font-size:12px}
 #visitor .visit-mail summary{cursor:pointer;min-height:28px;line-height:28px;color:var(--visit-green)}
-#visitor .visit-mail strong{display:block;letter-spacing:6px;font-size:26px;padding:12px 0;color:var(--text)}
+#visitor .visit-mail strong{display:block;letter-spacing:6px;font-size:28px;padding:12px 0;color:var(--text)}
 #visitor #visit-code{text-align:center;letter-spacing:4px;font-size:18px}
-#visitor .visit-ticket{padding:24px 16px;border:1px solid #d6e4dc;border-top:5px solid var(--visit-green);border-radius:16px;background:#fff;text-align:center}
-#visitor .visit-ticket h3{font-size:21px;margin:10px 0}
-#visitor #visit-validity{font-size:13px;color:var(--visit-green);margin:12px 0}
+#visitor .visit-ticket{padding:24px 16px;border:1px solid #d6e4dc;border-top:4px solid var(--visit-green);border-radius:16px;background:#fff;text-align:center}
+#visitor .visit-ticket h3{font-size:22px;margin:12px 0}
+#visitor #visit-validity{font-size:14px;color:var(--visit-green);margin:12px 0}
 #visitor #visit-qr svg{display:block;width:100%;max-width:240px;height:auto;margin:0 auto}
-#visitor .visit-watermark{color:#8f4c16;font-size:13px;font-weight:600;margin:10px 0 20px}
-#visitor .visit-ticket dl{border-top:1px dashed #ccdacf;text-align:left;padding-top:16px;margin:0}
-#visitor .visit-ticket dt{font-size:11px;color:var(--muted);margin:10px 0 4px}
-#visitor .visit-ticket dd{margin:0;font-size:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-#visitor .visit-ticket>p:last-child{font-size:11px;line-height:1.7;color:var(--muted);margin-top:20px;text-align:left}
-#visitor .visit-actions{display:flex;gap:10px;margin-top:16px}
+#visitor .visit-watermark{color:#8f4c16;font-size:14px;font-weight:600;margin:12px 0 20px}
+#visitor .visit-ticket dl{border-top:var(--divider-width) dashed var(--line);text-align:left;padding-top:16px;margin:0}
+#visitor .visit-ticket dt{font-size:12px;color:var(--muted);margin:12px 0 4px}
+#visitor .visit-ticket dd{margin:0;font-size:14px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+#visitor .visit-ticket>p:last-child{font-size:12px;line-height:1.7;color:var(--muted);margin-top:20px;text-align:left}
+#visitor .visit-actions{display:flex;gap:12px;margin-top:16px}
 #visitor .visit-actions button{flex:1;margin:0}
 #visitor .visit-status{font-size:12px;line-height:1.7;color:#96530d;margin:12px 0}
 #visitor .visit-status:empty{display:none}
+#visitor .visit-date-field{position:relative}
+#visitor .visit-date-field>input[type=hidden]{display:none}
+#visitor .visit-date-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:12px;border:1px solid #dce4df;border-radius:12px;background:#fafcfb;color:var(--text);font:inherit;font-size:14px;text-align:left;transition:background-color .12s ease,transform .12s ease}
+#visitor .visit-date-trigger svg{width:18px;height:18px;color:var(--visit-green);flex:none}
+#visitor .visit-date-trigger:active,.phone .visit-date-panel button:active{transform:scale(.98);background:#eef5f1}
+.phone .visit-date-sheet{--visit-green:var(--brand,#25855a);position:absolute;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.phone .visit-date-sheet.hidden{display:none}
+.phone .visit-date-mask{position:absolute;inset:0;background:rgba(18,38,29,.28);animation:visit-mask-in .18s ease-out both}
+.phone .visit-date-panel{position:relative;width:min(100%,430px);max-height:100%;overflow-y:auto;box-sizing:border-box;padding:8px 18px calc(18px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;background:#fff;box-shadow:0 -12px 34px rgba(27,54,42,.16);transform:translateY(var(--visit-sheet-drag,0));animation:visit-sheet-in .28s cubic-bezier(.22,.9,.3,1.05) both}
+.phone .visit-date-grabber{display:block;width:36px;height:4px;margin:0 auto 12px;border-radius:2px;background:#cbd5cf;touch-action:none}
+.phone .visit-date-panel header{display:grid;grid-template-columns:64px 1fr 64px;align-items:center;min-height:44px;border-bottom:var(--divider-width) solid var(--line);touch-action:none}
+.phone .visit-date-panel h2{margin:0;text-align:center;font-size:16px;color:var(--text)}
+.phone .visit-date-panel button{cursor:pointer;min-height:44px;padding:8px 0;border:0;background:none;color:var(--visit-green);font:inherit;font-size:14px}
+.phone .visit-date-panel header button:last-child{text-align:right;font-weight:700}
+.phone .visit-wheel-year{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0}
+.phone .visit-wheel-year button{width:44px;font-size:24px}
+.phone .visit-wheel-year button:disabled{opacity:.3;cursor:default}
+.phone .visit-wheel-year b{min-width:72px;text-align:center;font-size:14px;color:var(--text)}
+.phone .visit-wheel-labels,.phone .visit-date-wheels{display:grid;grid-template-columns:2.2fr 1fr 1fr;gap:8px;text-align:center}
+.phone .visit-wheel-labels{color:var(--muted);font-size:12px}
+.phone .visit-date-wheels{position:relative;margin-top:8px;isolation:isolate}
+.phone .visit-date-wheels:before{content:"";position:absolute;z-index:-1;inset:88px 0 auto;height:44px;box-sizing:border-box;border-block:1px solid #d6e8dd;border-radius:8px;background:#eef6f1;pointer-events:none}
+.phone .visit-date-wheel{height:220px;min-width:0;box-sizing:border-box;padding:88px 0;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;touch-action:pan-y;mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.phone .visit-date-wheel::-webkit-scrollbar{display:none}
+.phone .visit-wheel-tick{height:44px;line-height:44px;scroll-snap-align:center;font-size:16px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none}
+.phone .visit-wheel-tick.is-selected{color:var(--visit-green);font-weight:700}
+.phone .visit-date-panel :is(button,[role=spinbutton]):focus-visible{outline:2px solid var(--visit-green);outline-offset:-2px;border-radius:8px}
+.phone .visit-date-summary{margin:14px 0 8px;font-size:14px;font-weight:600;color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
+.phone .visit-date-help,.phone .visit-date-hint{margin:4px 0 0;line-height:1.6;color:var(--muted);font-size:12px;text-align:center}
+#visitor .visit-date-trigger[aria-invalid=true]{border-color:#96530d}
+.phone .visit-date-sheet.is-closing .visit-date-mask{animation:visit-mask-out .18s ease-in both}
+.phone .visit-date-sheet.is-closing .visit-date-panel{animation:visit-sheet-out .18s ease-in both}
+@keyframes visit-mask-in{from{opacity:0}to{opacity:1}}
+@keyframes visit-mask-out{from{opacity:1}to{opacity:0}}
+@keyframes visit-sheet-in{from{opacity:.7;transform:translateY(100%)}to{opacity:1;transform:translateY(var(--visit-sheet-drag,0))}}
+@keyframes visit-sheet-out{from{opacity:1;transform:translateY(var(--visit-sheet-drag,0))}to{opacity:.7;transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){#visitor .visit-date-trigger,.phone .visit-date-mask,.phone .visit-date-panel{transition:none;animation:none!important}.phone .visit-date-panel{transform:translateY(var(--visit-sheet-drag,0))}}
 #visitor-print-sheet{display:none}
 @media print{
   body.visitor-print{display:block!important;background:white!important;padding:0!important;margin:0!important}

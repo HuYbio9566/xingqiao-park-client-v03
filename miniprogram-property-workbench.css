@@ -1,0 +1,125 @@
+.screen .property-workbench-page{min-width:0;padding:16px 16px 24px;gap:12px}
+.screen .property-workbench-page.hidden{display:none}
+.property-workbench-page .role-panel{white-space:pre-line;overflow-wrap:anywhere}
+.property-workbench-page .role-status{max-width:55%;white-space:normal;text-align:right}
+.property-workbench-page [data-unavailable]{background:var(--bg);color:var(--muted)}
+.property-workbench-page small{color:var(--muted);font-size:12px}
+.property-workbench-page .role-actions button,.property-workbench-page .role-filter button{min-height:44px}
+.property-workbench-page form{min-width:0}
+.property-workbench-page textarea{max-width:100%}
+.property-workbench-page dd{overflow-wrap:anywhere}
+.property-workbench-page button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+@media (max-width:360px){.screen .property-workbench-page{padding-right:12px;padding-left:12px}}
+.property-workbench-page .approval-info-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:12px 0 0;font-size:14px;line-height:20px}
+.property-workbench-page .approval-info-grid dt{margin:0;color:var(--muted)}
+.property-workbench-page .approval-info-grid dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+/* 空状态与“我的服务”一致：120px、虚线框、半透明底、文案居中 */
+.property-workbench-page :is(.role-empty,.journey-empty){display:flex;align-items:center;justify-content:center;box-sizing:border-box;height:120px;margin:0;padding:0 16px;border:1px dashed #cfd8d3;border-radius:var(--r-md);background:rgba(255,255,255,.6);color:var(--muted);font-size:14px;line-height:20px;text-align:center}
+/* 审批卡片按钮：右对齐，查看详情为弱层级描边，审批通过为主按钮 */
+.property-workbench-page .role-actions.approval-card-actions{justify-content:flex-end;margin-top:12px}
+.property-workbench-page .approval-card-actions button{min-height:32px;padding:0 12px;border-radius:8px;font-size:14px}
+.property-workbench-page .approval-card-actions button:not(.role-primary){border:1px solid var(--line);background:#fff;color:var(--text)}
+/* 物业工作台四个中心：与审批中心同一布局（白底 Tab 容器 + 独立内容区 + 统一卡片） */
+.screen .property-workbench-page.property-center{padding:0;gap:0}
+.screen .property-workbench-page.property-center:not(.hidden){display:flex;flex-direction:column}
+.property-center>.approval-tabs{flex:none;margin:0}
+.property-center>.property-approval-content{flex:1 0 auto;display:grid;align-content:start;gap:12px;padding:var(--page-gutter)}
+.property-center .property-approval-section{display:grid;gap:12px}
+.property-center .role-panel{border:0}
+.property-center .journey-workbench-extension{display:grid;gap:12px;margin:0;padding:0;border:0;background:none}
+.property-center .journey-workbench-extension>h2,.property-center .journey-workbench-extension>.journey-copy{display:none}
+.property-center .journey-workbench-extension .journey-card{margin:0;padding:16px;border:0;box-shadow:none}
+.property-center .journey-fields{grid-template-columns:auto 1fr;gap:8px 16px;margin:12px 0 0;font-size:14px;line-height:20px}
+.property-center .journey-actions{justify-content:flex-end;margin-top:12px}
+.property-center .journey-actions button,.property-center .approval-card-actions button{height:32px;min-height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:1}
+.property-center .journey-actions button:not(.role-primary){border:1px solid var(--line);background:#fff;color:var(--text)}
+.property-center .bill-reconcile-form textarea{margin-top:8px}
+.property-center .bill-reconcile-form label{margin:12px 0 0}
+/* 四个中心：顶部状态 Tab 等分，下方一行类型筛选（复用招商空间底部弹层），卡片由 Tab 与筛选共同决定显隐 */
+.property-center>.approval-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+#property-workbench-feedback>.approval-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.property-center>.center-filter-bar{display:flex;gap:8px;overflow-x:auto;padding:12px var(--page-gutter) 0;scrollbar-width:none}
+.property-center>.center-filter-bar::-webkit-scrollbar{display:none}
+.property-center .center-filter-chip{flex:none;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border:0;border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:13px;white-space:nowrap;cursor:pointer}
+.property-center .center-filter-count{font-weight:400;color:var(--muted);font-size:12px}
+.property-center .center-filter-chip.active{background:var(--soft);color:var(--brand);font-weight:600}
+.property-center .center-filter-chip.active .center-filter-count{color:var(--brand)}
+.property-center .center-filter-chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.property-center .center-card[hidden]{display:none}
+.property-center .center-empty[hidden]{display:none}
+/* 逾期 / 即将到期：不加描边，用状态文字颜色提醒并置顶显示 */
+.property-center .role-panel.fee-alert .role-status{color:var(--accent);font-weight:600}
+/* 卡片类型标签：混合列表里先看类型 */
+.property-center .card-type-chip{flex:none;margin-right:0;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--brand);font-size:12px;line-height:18px;font-weight:400}
+.property-center .center-card .role-row{align-items:center;gap:8px}
+.property-center .center-card .role-row>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.property-center .center-card .role-row>.role-status{flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.property-center .center-card{cursor:pointer}
+/* 今日待办 */
+#property-workbench-todo .todo-type{flex:none;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--brand);font-size:12px;line-height:18px}
+#property-workbench-todo .role-row{gap:8px;align-items:center}
+#property-workbench-todo .role-row strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#property-workbench-todo .role-panel>p{margin:8px 0 0;color:var(--muted);font-size:13px}
+#property-workbench-todo .role-panel.todo-soon .role-status{color:var(--brand)}
+#property-workbench-todo .todo-group-title{margin:16px 4px 8px;font-size:14px;line-height:20px;font-weight:600;color:var(--muted, #6b7a72)}
+#property-workbench-todo .todo-group-title:first-child{margin-top:4px}
+/* 今日待办：四张卡下方一行，40px，浅绿底绿色字（同页面提示条样式），逾期提示用提示条同款黄色 */
+#profile .mp-my-services.property-workbench .mp-four-col>button.property-todo-bar[data-profile-entry]{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;height:40px;min-height:40px;padding:0 12px;border:0;border-radius:var(--r-md);background:var(--soft);color:var(--brand);text-align:left;font:inherit;font-size:12px;line-height:40px;cursor:pointer}
+#profile .property-workbench .property-todo-copy{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap}
+#profile .property-workbench .property-todo-copy strong{font-size:13px;font-weight:600}
+#profile .property-workbench .property-todo-note{padding:0 8px;border-radius:4px;background:#fff8e1;color:#c98a00;font-size:12px;line-height:20px}
+#profile .property-workbench .property-todo-bar svg{flex:none;width:16px;height:16px}
+.property-center .workorder-edit-form[hidden]{display:none}
+.property-center .workorder-edit-form{display:grid;gap:8px;margin-top:12px}
+.property-center .workorder-edit-form label{display:grid;gap:6px;color:var(--text);font-size:14px}
+.property-center .workorder-edit-form input,.property-center .workorder-edit-form textarea{box-sizing:border-box;width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+.property-center .approval-card-actions,.property-center .journey-actions{flex-wrap:wrap}
+/* 报修 / 车辆监控详情页：与申请详情同款白底页 */
+.screen .property-workbench-page.request-detail-view{padding:var(--page-gutter);gap:12px;background:var(--surface)}
+.property-workbench-page.request-detail-view .request-detail-actions textarea{min-height:96px}
+/* 详情页：白底撑满高度；操作按钮 44px、宽度撑满（多个按钮平分一行） */
+.screen .property-workbench-page.request-detail-view,.screen #role-request-detail.request-detail-view{min-height:100%;box-sizing:border-box;align-content:start}
+.request-detail-view .request-detail-actions .role-actions{display:flex;flex-wrap:nowrap;gap:12px;justify-content:stretch;margin-top:0}
+.request-detail-view .request-detail-actions .role-actions button{flex:1 1 0;min-width:0;min-height:44px;height:44px;padding:0 12px;border-radius:12px;font-size:16px}
+/* 整张卡片可点进入详情 */
+.property-workbench-page .role-panel.is-clickable{cursor:pointer;transition:background-color .15s}
+.property-workbench-page .role-panel.is-clickable:active{background:#f6f8f7}
+.property-workbench-page .role-panel.is-clickable:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* Override journey extension elements shown inside the workbench center pages to match button spec */
+.property-center .journey-actions button{height:32px;min-height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:1}
+.property-center .journey-activity-actions button{height:32px;min-height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:1}
+.property-center .journey-field input,.property-center .journey-field textarea,.property-center .journey-field select{min-height:40px;padding:8px 12px;border-radius:var(--r-sm);font-size:14px}
+.property-center .journey-field textarea{min-height:80px}
+.property-center .journey-field{font-size:14px}
+.property-center .journey-fields{grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px}
+.property-center .journey-card>p,.property-center .journey-copy{font-size:12px}
+.property-center .journey-feedback{font-size:12px}
+/* 物业“我的服务”：入口保留可见，点击后弹窗说明该身份不可用 */
+#profile .mp-my-services.property-own-services .mp-service-item.is-unavailable{opacity:.45;filter:grayscale(1);cursor:not-allowed}
+/* 收费详情：处理记录 + 修改状态（选项按钮 + 备注 + 保存） */
+#property-workbench-fee-detail .fee-log,#property-workbench-fee-detail .fee-status-form{display:grid;gap:12px;padding:16px;border-radius:var(--r-md);background:var(--bg)}
+#property-workbench-fee-detail h2{margin:0;font-size:15px;line-height:22px;color:var(--text)}
+#property-workbench-fee-detail .fee-log-empty{margin:0;color:var(--muted);font-size:13px}
+#property-workbench-fee-detail .fee-log-row{display:grid;grid-template-columns:auto auto 1fr;gap:4px 8px;align-items:baseline;font-size:13px;line-height:20px}
+#property-workbench-fee-detail .fee-log-time{color:var(--muted)}
+#property-workbench-fee-detail .fee-log-row b{color:var(--brand);font-weight:600}
+#property-workbench-fee-detail .fee-log-row p{margin:0;color:var(--text);overflow-wrap:anywhere}
+#property-workbench-fee-detail .fee-status-options{display:flex;flex-wrap:wrap;gap:8px}
+#property-workbench-fee-detail .fee-status-options button{height:36px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+#property-workbench-fee-detail .fee-status-options button.active{border-color:var(--soft);background:var(--soft);color:var(--brand);font-weight:600}
+#property-workbench-fee-detail .fee-status-form label{display:grid;gap:6px;font-size:14px;color:var(--text)}
+#property-workbench-fee-detail .fee-status-form textarea{box-sizing:border-box;width:100%;min-height:88px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:14px}
+#property-workbench-fee-detail .fee-status-form .role-actions{margin:0}
+#property-workbench-fee-detail .fee-status-form .role-actions button{flex:1;height:44px;border-radius:12px;font-size:16px}
+.property-workbench-page .fee-receipt-confirm,#property-workbench-fee-detail .fee-status-form .fee-receipt-confirm{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.6;color:var(--text)}
+.property-workbench-page .fee-receipt-confirm[hidden],#property-workbench-fee-detail .fee-status-form .fee-receipt-confirm[hidden]{display:none}
+.property-workbench-page .fee-receipt-confirm input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:var(--brand)}
+/* 删除二次确认弹窗：沿用身份提示弹层样式，按钮左右并排，确认为红色 */
+.mini-confirm .mini-confirm-card{padding:28px 24px 20px;text-align:center}
+.mini-confirm .mini-confirm-icon{background:#fdecec;color:#d14343}
+.mini-confirm .mini-confirm-card p{margin:12px 0 24px}
+.mini-confirm .mini-confirm-actions{display:flex;gap:12px}
+.mini-confirm .mini-confirm-actions button{flex:1;height:44px;border-radius:12px;font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.mini-confirm .mini-confirm-cancel{border:1px solid var(--line);background:#fff;color:var(--text)}
+.mini-confirm .mini-confirm-ok{border:0;background:var(--brand);color:#fff}
+.mini-confirm.is-danger .mini-confirm-ok{background:#d14343}

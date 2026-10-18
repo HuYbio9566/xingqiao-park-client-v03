@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <defs><linearGradient id="tile" x1="6" y1="0" x2="42" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#60adfa"/><stop offset="1" stop-color="#3165d6"/></linearGradient></defs>
+  <rect width="48" height="48" rx="14" fill="url(#tile)"/>
+  <rect x=".5" y=".5" width="47" height="47" rx="13.5" stroke="white" stroke-opacity=".22"/>
+  <g fill="white"><circle cx="14" cy="24" r="2.5"/><circle cx="24" cy="24" r="2.5"/><circle cx="34" cy="24" r="2.5"/></g>
+</svg>

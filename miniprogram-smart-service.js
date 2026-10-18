@@ -9,17 +9,48 @@
       { question: '如何了解入驻优惠政策？', match: /优惠|政策|补贴|税收/, answer: '优惠政策通常涉及企业类型、行业方向及申报条件。请先整理企业主营业务和入驻计划，再向招商顾问确认适用范围、有效期与申请材料；具体资格和额度以正式政策及审核结果为准。' }
     ];
     var page = document.createElement('section'); page.id = 'smart-service'; page.className = 'hidden'; page.setAttribute('aria-label', '智能客服问答');
-    page.innerHTML = '<div class="qa-content"><header class="qa-intro"><span class="qa-mark" aria-hidden="true"><i data-lucide="bot"></i></span><h1>您好，有什么可以帮您？</h1><p>我是园区智能助手，为您解答空间选址、入驻流程与园区服务问题。</p></header><div class="qa-topics"><h2>常见问题</h2></div><div class="qa-history" role="log" aria-live="polite" aria-relevant="additions" aria-label="智能问答记录"></div></div><form class="qa-form"><div class="qa-input-row"><textarea rows="1" maxlength="500" aria-label="向智能客服提问" aria-describedby="qa-status" placeholder="请输入您想了解的问题…"></textarea><button type="submit" class="qa-submit" disabled>提问</button></div><p class="qa-status" id="qa-status" role="status">回答供参考，具体信息以正式通知及合同为准。</p></form>';
+    page.innerHTML = '<div class="qa-content"><header class="qa-intro"><span class="qa-mark" aria-hidden="true"><img src="miniprogram/assets/icons/message-smart.svg?v=20261015" alt=""></span><h1>您好，有什么可以帮您？</h1><p>我是园区智能助手，为您解答空间选址、入驻流程与园区服务问题。</p></header><div class="qa-topics"><h2>常见问题</h2></div><p class="qa-ended">会话已结束 · 超过24小时没有新对话，发送新问题将开始新的会话</p><div class="qa-history" role="log" aria-live="polite" aria-relevant="additions" aria-label="智能问答记录"></div></div><form class="qa-form"><div class="qa-input-row"><textarea rows="1" maxlength="500" aria-label="向智能客服提问" aria-describedby="qa-status" placeholder="请输入您想了解的问题…"></textarea><button type="submit" class="qa-submit" disabled>提问</button></div><p class="qa-status" id="qa-status" role="status">回答供参考，具体信息以正式通知及合同为准。</p></form>';
     document.querySelector('.screen').appendChild(page);
     window.__setMiniRoute('smart-service', '智能客服', 'home');
+    document.addEventListener('click', function (event) {
+      var entry = event.target.closest('[data-page="smart-service"]');
+      if (entry) { window.__setMiniRoute('smart-service', '智能客服', entry.closest('section')?.id || 'home'); ensureRole(); showCurrent(); }
+    }, true);
     var profile = document.getElementById('profile'), history = page.querySelector('.qa-history'), content = page.querySelector('.qa-content');
     var input = page.querySelector('textarea'), submit = page.querySelector('.qa-submit'), status = page.querySelector('.qa-status');
-    var records = [], draft = '';
-    function key() { return 'park-smart-qa-v1-' + (profile.dataset.role || 'guest'); }
-    function save() {
-      try { localStorage.setItem(key(), JSON.stringify({ records: records, draft: input.value })); }
-      catch (error) { status.textContent = '问答记录暂不能保存，刷新后可能丢失。'; }
+    var records = [], draft = '', archives = [], lastActivity = null, activeRole = '', timer, viewing = false;
+    var idleLimit = 24 * 60 * 60 * 1000;
+    function role() { return profile.dataset.role || 'guest'; }
+    function key() { return 'park-smart-qa-v1-' + activeRole; }
+    function persist(value) {
+      try { localStorage.setItem(key(), JSON.stringify(value)); return true; }
+      catch (error) { return false; }
     }
+    function save() {
+      if (!persist({ records: records, draft: input.value, lastActivity: lastActivity, archives: archives })) status.textContent = '问答记录暂不能保存，刷新后可能丢失。';
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (records.length && lastActivity !== null) timer = setTimeout(function () { ensureRole(); checkExpiry(); }, Math.max(0, lastActivity + idleLimit - Date.now()));
+    }
+    function checkExpiry() {
+      if (!records.length || lastActivity === null || Date.now() - lastActivity < idleLimit) { schedule(); return true; }
+      var now = Date.now();
+      var archive = { id: activeRole + '-' + now + '-' + archives.length, records: records.slice(), lastActivity: lastActivity, archivedAt: now };
+      var nextArchives = archives.concat(archive);
+      // Commit the archive before clearing the current conversation.
+      if (!persist({ records: [], draft: '', lastActivity: null, archives: nextArchives })) {
+        status.textContent = '问答归档保存失败，当前会话已保留，请稍后重试。';
+        clearTimeout(timer); timer = setTimeout(function () { ensureRole(); checkExpiry(); }, 60000);
+        return false;
+      }
+      archives = nextArchives; records = []; draft = ''; lastActivity = null;
+      if (!viewing) history.replaceChildren(); input.value = ''; update(); clearTimeout(timer);
+      status.textContent = '上一段问答已归档，您可以开始新的提问。';
+      window.dispatchEvent(new CustomEvent('park-smart-archives-changed', { detail: { role: activeRole } }));
+      return true;
+    }
+    function ensureRole() { if (activeRole !== role()) load(); }
     function update() { submit.disabled = !input.value.trim(); input.style.height = 'auto'; input.style.height = Math.max(44, Math.min(input.scrollHeight, 120)) + 'px'; }
     function append(record) {
       var article = document.createElement('article'), question = document.createElement('p'), answer = document.createElement('div');
@@ -31,25 +62,56 @@
       article.append(question, answer); history.appendChild(article);
     }
     function ask(question) {
+      ensureRole();
       question = question.trim(); if (!question) return;
       if (question.length > 500) { status.textContent = '问题不能超过500字。'; return; }
+      if (!checkExpiry()) return;
+      if (viewing) showCurrent();
       var topic = topics.find(function (item) { return item.question === question; }) || [topics[5], topics[3], topics[1], topics[4], topics[2], topics[0]].find(function (item) { return item.match.test(question); });
       var record = { question: question, topic: topic ? topic.question : '', answer: topic ? topic.answer : '暂时没有找到与这个问题匹配的信息。您可以补充关键词，或选择上方常见问题继续了解；涉及具体房源和办理进度，请从房源详情联系招商顾问确认。' };
-      records.push(record); append(record); input.value = ''; update();
-      status.textContent = '回答供参考，具体信息以正式通知及合同为准。'; save(); content.scrollTop = content.scrollHeight;
+      records.push(record); lastActivity = Date.now(); append(record); input.value = ''; update();
+      status.textContent = '回答供参考，具体信息以正式通知及合同为准。'; save(); schedule(); content.scrollTop = content.scrollHeight;
+      window.dispatchEvent(new Event('park-smart-records-changed'));
     }
     topics.forEach(function (topic) { var button = document.createElement('button'); button.type = 'button'; button.innerHTML = '<span></span><i data-lucide="chevron-right"></i>'; button.querySelector('span').textContent = topic.question; button.onclick = function () { ask(topic.question); }; page.querySelector('.qa-topics').appendChild(button); });
     page.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); ask(input.value); });
-    input.addEventListener('input', function () { update(); save(); });
+    input.addEventListener('input', function () { ensureRole(); update(); save(); });
     input.addEventListener('keydown', function (event) { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && event.keyCode !== 229) { event.preventDefault(); ask(input.value); } });
-    function load() {
-      records = []; draft = ''; status.textContent = '回答供参考，具体信息以正式通知及合同为准。';
-      try { var saved = JSON.parse(localStorage.getItem(key()) || 'null'); if (saved) { records = Array.isArray(saved.records) ? saved.records.filter(function (item) { return item && typeof item.question === 'string' && typeof item.answer === 'string'; }) : []; draft = typeof saved.draft === 'string' ? saved.draft : ''; } }
-      catch (error) { status.textContent = '暂时无法读取历史问答，您可以继续提问。'; }
-      history.replaceChildren(); records.forEach(append); input.value = draft; update();
+    // Prior conversations shown on first visit, different per role: [topic indexes, age in ms].
+    var HOUR = 60 * 60 * 1000, DAY = 24 * HOUR;
+    var seedPlans = {
+      guest: { current: [[0], 50 * 60000], archives: [] },
+      employee: { current: [[0, 3, 4], 2 * HOUR], archives: [[[1, 2], 3 * DAY]] },
+      admin: { current: [[5], 10 * 60000], archives: [[[3], DAY + 4 * HOUR], [[0, 1, 2], 6 * DAY]] },
+      property: { current: [[4, 1], 4 * HOUR], archives: [] }
+    };
+    function seedRecords() {
+      var plan = seedPlans[activeRole]; if (!plan) return;
+      var now = Date.now(), pick = function (i) { return { question: topics[i].question, topic: topics[i].question, answer: topics[i].answer }; };
+      records = plan.current[0].map(pick); lastActivity = now - plan.current[1];
+      archives = plan.archives.map(function (item, i) { return { id: activeRole + '-seed2-' + i, records: item[0].map(pick), lastActivity: now - item[1], archivedAt: now - item[1] + DAY }; }).reverse();
+      persist({ records: records, draft: '', lastActivity: lastActivity, archives: archives });
     }
-    new MutationObserver(load).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
-    new MutationObserver(function () { if (!page.classList.contains('hidden')) { update(); content.scrollTop = records.length ? content.scrollHeight : 0; } }).observe(page, { attributes: true, attributeFilter: ['class'] });
+    function showCurrent() { viewing = false; page.classList.remove('qa-archived'); history.replaceChildren(); records.forEach(append); }
+    function load() {
+      clearTimeout(timer); activeRole = role(); viewing = false; page.classList.remove('qa-archived');
+      records = []; draft = ''; archives = []; lastActivity = null; status.textContent = '回答供参考，具体信息以正式通知及合同为准。';
+      var migrated = false;
+      try { var saved = JSON.parse(localStorage.getItem(key()) || 'null'); if (saved) { records = Array.isArray(saved.records) ? saved.records.filter(function (item) { return item && typeof item.question === 'string' && typeof item.answer === 'string'; }) : []; draft = typeof saved.draft === 'string' ? saved.draft : ''; archives = Array.isArray(saved.archives) ? saved.archives : []; if (records.length) { lastActivity = typeof saved.lastActivity === 'number' && Number.isFinite(saved.lastActivity) && saved.lastActivity >= 0 ? saved.lastActivity : Date.now(); migrated = lastActivity !== saved.lastActivity; } } }
+      catch (error) { status.textContent = '暂时无法读取历史问答，您可以继续提问。'; }
+      if (saved === null || (saved && Array.isArray(saved.archives) && saved.archives.some(function (a) { return a && /-seed$/.test(a.id); }))) seedRecords();
+      history.replaceChildren(); records.forEach(append); input.value = draft; update();
+      if (migrated) save();
+      checkExpiry();
+    }
+    new MutationObserver(ensureRole).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
+    new MutationObserver(function () { if (!page.classList.contains('hidden')) { ensureRole(); checkExpiry(); update(); content.scrollTop = records.length ? content.scrollHeight : 0; } }).observe(page, { attributes: true, attributeFilter: ['class'] });
+    window.__smartService = {
+      listArchives: function () { ensureRole(); checkExpiry(); return JSON.parse(JSON.stringify(archives)); },
+      openCurrent: function () { ensureRole(); checkExpiry(); showCurrent(); },
+      openArchive: function (index) { ensureRole(); var archive = archives[index]; if (!archive || !Array.isArray(archive.records)) return false; viewing = true; page.classList.add('qa-archived'); history.replaceChildren(); archive.records.forEach(append); return true; },
+      conversation: function () { ensureRole(); checkExpiry(); return JSON.parse(JSON.stringify({ records: records, lastActivity: lastActivity, archives: archives })); }
+    };
     load();
     if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true', focusable: 'false' } });
   }

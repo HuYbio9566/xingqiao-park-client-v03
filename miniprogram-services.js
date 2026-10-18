@@ -59,12 +59,28 @@
   }
   function save(kind,record,target){
     record.id=store.id();record.created=new Date().toISOString();record.state='已保存';
+    if(kind==='consultations'){
+      record.owner=document.getElementById('profile').dataset.role||'guest';
+      if(['employee','admin'].includes(record.owner))record.company='北京星桥科技';
+      record.channel=record.title||'园区咨询';
+    }
+    if(kind==='feedback'){
+      record.owner=document.getElementById('profile').dataset.role||'guest';
+      if(['employee','admin'].includes(record.owner))record.company='北京星桥科技';
+    }
     store.data[kind].unshift(record);
     if(!store.save()){
       store.data[kind].shift();
       return message(target,'保存失败，未生成记录。请检查浏览器存储权限或空间后重试。');
     }
     renderAll();showRecord(kind,record);
+    if(kind==='consultations'){
+      var noteField=record.fields.find(function(field){return field[0]==='留言备注';});
+      if(window.__messageJourney && window.__messageJourney.setContext)window.__messageJourney.setContext(record.channel);
+      if(window.__messageJourney && window.__messageJourney.append)window.__messageJourney.append(noteField?noteField[1]:'已提交咨询留言',true);
+      window.dispatchEvent(new Event('park-consultation-saved'));
+    }
+    if(kind==='feedback')window.dispatchEvent(new Event('park-feedback-saved'));
     return true;
   }
   var style=node('style');
@@ -236,14 +252,14 @@
 
   var bookingsButton=document.querySelector('#meeting .my-bookings-button');
   var meetingHeading=document.querySelector('#meeting .meeting-results > .field-title');
-  meetingHeading.querySelector('.muted').remove();
+  if(meetingHeading)meetingHeading.querySelector('.muted').remove();
   bookingsButton.remove();
   var v2Style=node('style');
   v2Style.textContent=`
     .phone>.navbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.5px;background:#f0f2f0;pointer-events:none}
     #home .facts{height:68.9px;padding:8px;align-items:center}
     #home .facts>div{position:relative;padding:0;border-left:0;text-align:center}
-    #home .facts>div+div::before{content:"";position:absolute;left:0;top:0;bottom:0;width:.5px;background:var(--line)}
+    #home .facts>div+div::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--divider-width);background:var(--line)}
     #home .v2-services-card{border-radius:var(--r-md);background:var(--surface);box-shadow:var(--shadow)}
     #home .service-grid{align-items:start;background:transparent;box-shadow:none}
     #home .v2-services-card .service-grid{margin-top:-8px;margin-bottom:-8px}
@@ -291,7 +307,6 @@
       }else markRequired(label,input);
     });
     container.querySelectorAll('.agreement input').forEach(function(input){input.required=true;input.setAttribute('aria-required','true')});
-    if(container!==repair&&container!==feedback)container.querySelector('.form-card').before(node('p','* 为必填项','required-hint'));
   });
   var quickForm=document.getElementById('quick-booking-form');
   ['quick-name','quick-phone'].forEach(function(id){markRequired(quickForm.querySelector('label[for="'+id+'"]'),document.getElementById(id))});

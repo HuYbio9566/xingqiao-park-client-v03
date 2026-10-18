@@ -1,0 +1,91 @@
+.screen .my-services-page{min-height:100%;padding:var(--page-gutter);border-top:var(--divider-width) solid var(--line);background:var(--bg)}
+.my-services-page.hidden{display:none}
+.my-services-page h1{margin:0;font-size:20px;line-height:1.5}
+.my-services-page h2{margin:0;font-size:16px;line-height:1.5}
+.my-services-page p{margin:8px 0;font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.my-services-page .my-services-description{color:var(--muted);font-size:12px}
+.my-services-filters{display:flex;gap:8px;overflow:auto;margin:16px 0;padding-bottom:4px}
+.my-services-filters button{flex:none;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);color:var(--muted);font-size:14px;cursor:pointer}
+.my-services-filters button[aria-pressed=true]{border-color:var(--brand);background:var(--soft);color:var(--brand);font-weight:600}
+.my-services-section{min-width:0;margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.my-services-record{margin-top:16px;padding-top:16px;border-top:var(--divider-width) solid var(--line)}
+.my-services-record strong{min-width:0;overflow-wrap:anywhere}
+.my-services-record p{color:var(--muted);font-size:14px;white-space:pre-wrap}
+.my-services-record small{display:block;color:var(--muted);font-size:12px}
+.my-services-page .my-services-empty{display:flex;align-items:center;justify-content:center;box-sizing:border-box;height:120px;margin:0;padding:0 16px;border:1px dashed #cfd8d3;border-radius:var(--r-md);background:rgba(255,255,255,.6);color:var(--muted);font-size:14px;text-align:center}
+.my-services-page .role-actions{flex-wrap:wrap}
+.my-services-page .role-actions button{min-height:44px;max-width:100%;white-space:normal}
+.my-services-fields{margin:0;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.my-services-fields dt{margin-top:16px;font-size:12px;color:var(--muted)}
+.my-services-fields dt:first-child{margin-top:0}
+.my-services-fields dd{margin:8px 0 0;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.my-services-page button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.screen .my-services-page.my-services-list:not(.hidden){display:flex;flex-direction:column;padding:0;border-top:0}
+.my-services-list>.my-services-filters{flex:none}
+.my-services-list>.my-services-content{flex:1 0 auto;padding:var(--page-gutter)}
+.my-services-list .my-services-filters{display:flex;gap:0;height:44px;margin:0;padding:0;overflow-x:auto;background:#fff;border-bottom:var(--divider-width) solid var(--line);scrollbar-width:none}
+.my-services-list .my-services-filters::-webkit-scrollbar{display:none}
+.my-services-list .my-services-filters button{position:relative;flex:1 0 auto;min-height:44px;height:44px;padding:0 12px;border:0;border-radius:0;background:#fff;color:var(--muted);font-size:14px;font-weight:400}
+.my-services-list .my-services-filters button[aria-pressed=true]{background:#fff;color:var(--brand);font-weight:600}
+.my-services-list .my-services-filters button[aria-pressed=true]:after{content:"";position:absolute;right:20%;bottom:0;left:20%;height:2px;border-radius:2px;background:var(--brand)}
+.my-services-list .my-services-filters button:focus-visible{outline-offset:-2px}
+.my-services-content>.my-order-card+.my-order-card{margin-top:12px}
+.my-order-card{min-width:0;padding:0 16px;border-radius:var(--r-md);background:var(--surface)}
+.my-order-head{display:flex;align-items:center;justify-content:space-between;gap:12px;height:44px;border-bottom:var(--divider-width) solid var(--line);font-size:14px}
+.my-order-type{color:var(--muted)}
+.my-order-status{color:#d46b08;font-weight:600}
+.my-order-status.is-closed{color:var(--muted);font-weight:400}
+.my-order-body{padding:12px 0;cursor:pointer}
+.my-order-body strong{display:block;font-size:16px;line-height:22px;overflow-wrap:anywhere}
+.my-services-page .my-order-body p{margin:4px 0 0;color:var(--muted);font-size:14px;line-height:20px}
+.my-order-body small{display:inline-block;margin-top:8px;padding:0 8px;border-radius:4px;background:var(--bg);color:var(--muted);font-size:12px;line-height:18px}
+.my-order-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:12px 0 0;font-size:14px;line-height:20px}
+.my-order-grid dt{color:var(--muted)}
+.my-order-grid dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+.my-services-page .my-order-note{margin:0;color:#d46b08;font-size:12px}
+.my-services-page .my-order-note:empty{display:none}
+.my-order-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding:12px 0;border-top:var(--divider-width) solid var(--line)}
+.my-order-actions button{min-height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+.my-order-actions button.is-primary{border-color:var(--brand);color:var(--brand)}
+.my-order-detail{display:grid;gap:12px}
+.screen #my-service-detail{background:var(--surface)}
+.my-order-banner{display:grid;gap:4px;padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
+.my-order-banner strong{font-size:18px;line-height:24px}
+.my-order-banner span{font-size:12px;opacity:.85}
+.my-order-banner.is-closed{background:#eef0ef;color:var(--muted)}
+.my-order-banner.is-closed span{opacity:1}
+.my-order-detail>.my-order-actions{padding:0;border-top:0}
+.my-order-form{display:grid;gap:12px;padding:16px;border-radius:var(--r-md);background:var(--surface)}
+.my-order-form label{display:grid;gap:8px;color:var(--muted);font-size:12px}
+.my-order-form input{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:var(--text);font:inherit;font-size:14px}
+.my-order-form .my-order-actions{padding:4px 0 0;border-top:0}
+/* 详情页物业联系人：头像 + 姓名/岗位 + 电话 / 在线咨询（32px 按钮，圆角 8px，字号 14px） */
+.my-contact-card{display:grid;gap:16px;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.my-contact-person{display:flex;align-items:center;gap:12px;min-width:0}
+.my-contact-avatar{display:grid;flex:none;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--soft);color:var(--brand);font-size:16px;font-weight:600}
+.my-contact-info{display:grid;flex:1;gap:4px;min-width:0}
+.my-contact-name{display:flex;align-items:center;gap:8px;min-width:0}
+.my-contact-tag{flex:none;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--brand);font-size:12px;font-style:normal;line-height:18px}
+.my-contact-info strong{overflow:hidden;font-size:16px;line-height:24px;white-space:nowrap;text-overflow:ellipsis}
+.my-contact-info>span{overflow:hidden;color:var(--muted);font-size:12px;line-height:16px;white-space:nowrap;text-overflow:ellipsis}
+.my-contact-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.my-contact-actions .my-contact-btn{width:100%;min-height:40px}
+.my-contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;min-height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px;line-height:20px;text-decoration:none;cursor:pointer}
+.my-contact-btn svg{width:16px;height:16px}
+.my-contact-btn.is-primary{border-color:var(--brand);background:var(--brand);color:#fff}
+.my-contact-btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.my-order-card .my-order-actions button.is-solid{border-color:var(--brand);background:var(--brand);color:#fff}
+/* 详情页底部按钮：与审批详情一致的大按钮（44px 高、12px 圆角、16px 字号，平分整行），最后一个为实色主按钮 */
+.my-order-detail>.my-order-actions,.my-order-detail .my-order-form .my-order-actions{display:flex;flex-wrap:nowrap;gap:12px}
+.my-order-detail>.my-order-actions button,.my-order-detail .my-order-form .my-order-actions button{flex:1 1 0;min-width:0;height:44px;min-height:44px;padding:0 12px;border-radius:12px;font-size:16px}
+.my-order-detail>.my-order-actions button:last-child:not([data-detail-delete]),.my-order-detail .my-order-form .my-order-actions button:last-child{border-color:var(--brand);background:var(--brand);color:#fff}
+/* 全局文字头像统一为「我的」页头像样式：圆形、绿色渐变、白色加粗首字（各处保留自身尺寸；照片头像不加渐变） */
+.my-contact-avatar,#messages .message-avatar.message-avatar-person:not(:has(img)),.leasing-chat .chat-agent .chat-avatar:not(:has(img)),.leasing-chat .chat-message .chat-avatar:not(:has(img)){border-radius:50%;background:radial-gradient(circle at 32% 28%,#24a56d,#0b8155 68%,#08734b 100%);box-shadow:inset -5px -6px 12px rgba(0,55,35,.12),inset 2px 2px 6px rgba(255,255,255,.12);color:#fff;font-weight:650}
+/* 我的服务详情顶部：与工作台详情一致（标题 + 状态标签，下方类型 · 编号） */
+.my-order-banner.is-headed .request-detail-banner-head>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.my-order-banner.is-closed .request-detail-status{background:#fff;color:var(--muted)}
+
+.my-services-list .my-bill-types{display:flex;flex:none;gap:8px;padding:12px 16px 0;overflow-x:auto;scrollbar-width:none}
+.my-services-list .my-bill-types::-webkit-scrollbar{display:none}
+.my-services-list .my-bill-types button{flex:none;height:32px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:14px;cursor:pointer}
+.my-services-list .my-bill-types button[aria-pressed=true]{border-color:var(--soft);background:var(--soft);color:var(--brand);font-weight:600}

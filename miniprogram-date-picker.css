@@ -1,0 +1,29 @@
+/* 全局日期选择：触发框与弹窗沿用场地预约（quick-date-trigger / booking-calendar），这里只补通用部分 */
+.mini-date-native{position:absolute!important;width:1px!important;height:1px!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;opacity:0;pointer-events:none}
+label:has(>.mini-date-native){position:relative}
+.mini-date-trigger{margin-top:8px;cursor:pointer}
+.mini-date-trigger span.is-placeholder{color:var(--muted)}
+.mini-date-sheet{position:absolute;z-index:90;inset:0}
+.mini-date-sheet .calendar-grid button:disabled{opacity:.3;cursor:default}
+.mini-time-block{margin-top:16px;padding-top:12px;border-top:var(--divider-width) solid var(--line)}
+.mini-time-block[hidden]{display:none}
+.mini-time-title{margin:0 0 8px;color:var(--muted);font-size:13px}
+.mini-time-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:168px;overflow-y:auto}
+.mini-time-slot{height:36px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+.mini-time-slot.selected{border-color:var(--brand);background:var(--soft);color:var(--brand);font-weight:600}
+.mini-time-slot:disabled{opacity:.3;cursor:default}
+.mini-date-hint{margin:8px 0 0;color:var(--accent);font-size:12px;text-align:center}
+.mini-date-hint:empty{display:none}
+/* 联系工作人员 / 报修 / 投诉建议等 form-row 表单：改为移动端输入框（与 journey-field 一致），去掉行间分割线和聚焦时的浏览器描边 */
+.phone .form-card{padding:16px}
+.phone .form-row{padding:0;border-bottom:0}
+.phone .form-row+.form-row{margin-top:16px}
+.phone .form-row label{margin-bottom:8px;font-size:14px;font-weight:400;color:var(--text)}
+.phone .form-row input:not([type="checkbox"]):not([type="radio"]),.phone .form-row select,.phone .form-row textarea{display:block;width:100%;box-sizing:border-box;min-height:40px;height:auto;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font:inherit;font-size:14px;line-height:1.5;outline:0;transition:border-color .15s}
+.phone .form-row textarea{min-height:80px;resize:vertical}
+.phone .form-row input::placeholder,.phone .form-row textarea::placeholder{color:#a7b2ac}
+.phone .form-row .service-select-trigger{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+/* The renovation label already supplies an 8px grid gap. */
+#role-request-form:has(input[name="location"]) .mini-date-trigger{margin-top:0;box-sizing:border-box;height:44px;min-height:44px}
+.phone #feedback .form-row select[hidden]{display:none}
+.phone #feedback .form-row input[type="tel"],.phone #feedback .form-row select,.phone #feedback .service-select-trigger{height:44px;min-height:44px}

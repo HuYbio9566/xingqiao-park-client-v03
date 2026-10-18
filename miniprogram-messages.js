@@ -4,6 +4,28 @@
   var profile = document.getElementById('profile');
   var screen = document.querySelector('.screen');
   var cards = Array.from(list.querySelectorAll('[data-message]'));
+  var title = document.querySelector('.navbar .nav-title');
+  var clear = document.createElement('button');
+  clear.type = 'button'; clear.className = 'message-clear-unread';
+  clear.setAttribute('aria-label', '清除未读消息'); clear.setAttribute('title', '清除未读消息');
+  clear.innerHTML = '<span class="message-clear-circle"><i data-lucide="brush" aria-hidden="true"></i></span>';
+  title.after(clear);
+  function syncClear() {
+    clear.hidden = list.classList.contains('hidden');
+    clear.disabled = !list.querySelector('[data-message]:not([data-message-retired]) .message-unread,.property-message-workspace .message-unread');
+  }
+  clear.onclick = function () {
+    if (!window.confirm('是否将全部消息标记为已读？')) return;
+    if (profile.dataset.role === 'property') {
+      window.__propertyMessages.clearUnread();
+    } else {
+      state.read = cards.map(function (card) { return card.dataset.message; });
+      Object.keys(state.consultants).forEach(function (id) { state.consultants[id].unread = false; });
+      save(); render();
+    }
+    syncClear();
+  };
+  new MutationObserver(syncClear).observe(list, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
   var state;
   var consultantPages = {};
   var consultants = {
@@ -38,6 +60,29 @@
     { self: true, text: '下午两点左右比较合适，也想一起了解停车和餐饮配套。' },
     { self: false, text: '好的，看房时可以一起了解停车和餐饮配套。周五14:00的接待时间待确认，请留意后续消息。' }
   ];
+  // Demo timeline per role (age of each conversation's latest message) so the time-sorted inbox shows different mixes.
+  var MIN = 60000, HOUR = 60 * MIN, DAY = 24 * HOUR;
+  var timelines = {
+    guest: { wang: 8 * MIN, 4: 5 * HOUR, 5: 3 * DAY },
+    employee: { wang: 25 * MIN, 4: 3 * HOUR, 5: DAY + 2 * HOUR },
+    admin: { wang: 2 * DAY + 3 * HOUR, 5: 40 * MIN, hide: [4] }
+  };
+  function timeline(role) { return timelines[role || profile.dataset.role] || timelines.guest; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  // Today: HH:mm; yesterday: 昨天; older: MM-DD.
+  function messageTime(at) {
+    if (!at) return '';
+    var date = new Date(at), today = new Date(); today.setHours(0, 0, 0, 0);
+    if (date >= today) return pad(date.getHours()) + ':' + pad(date.getMinutes());
+    if (date >= today - DAY) return '昨天';
+    return pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+  }
+  window.__messageTime = messageTime;
+  function stamp(card, at) { card.dataset.at = String(at || 0); card.querySelector('time').textContent = messageTime(at); }
+  function noticeAt(id) {
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+    return { '园区服务通知': new Date(y, 8, 12, 10).getTime(), 'example-message-9': Math.min(new Date(y, m, d, 9).getTime(), Date.now() - 30 * MIN), 'example-message-10': new Date(y, m, d - 1, 16, 30).getTime(), 'example-message-11': new Date(y, 9, 3, 9, 30).getTime() }[id];
+  }
   var storageWarning = document.createElement('p');
   storageWarning.className = 'journey-warning';
   storageWarning.setAttribute('role', 'status');
@@ -64,7 +109,10 @@
     } catch (e) { warn(); }
   }
   function warn() { storageWarning.hidden = false; storageWarning.textContent = '本地记录暂不能保存，刷新后可能丢失。您仍可继续体验。'; }
-  function save() { try { localStorage.setItem(key(), JSON.stringify(state)); } catch (e) { warn(); } }
+  function save() { if (profile.dataset.role === 'property') return; try {
+    var stored = JSON.parse(localStorage.getItem(key()) || '{}') || {};
+    localStorage.setItem(key(), JSON.stringify(Object.assign({}, state, { propertyDraft: stored.propertyDraft || '', propertyReadCount: stored.propertyReadCount || 0 })));
+  } catch (e) { warn(); } }
   function render() {
     cards.forEach(function (card, index) {
       var dot = card.querySelector('.message-unread');
@@ -75,34 +123,33 @@
         card.querySelector('.message-avatar').appendChild(dot);
       }
     });
-    if (state.chat.length) {
-      cards[0].querySelector('.message-preview').textContent = state.chat[state.chat.length - 1].text;
-      cards[0].querySelector('time').textContent = '最近';
-    } else {
-      cards[0].querySelector('.message-preview').textContent = conversation[conversation.length - 1].text;
-      cards[0].querySelector('time').textContent = '刚刚';
-    }
-    cards[0].querySelector('.message-source').textContent = '招商顾问 · ' + state.context;
+    var tl = timeline();
+    var lastChat = state.chat[state.chat.length - 1];
+    cards[0].querySelector('.message-preview').textContent = (lastChat || conversation[conversation.length - 1]).text;
+    stamp(cards[0], lastChat && lastChat.at ? lastChat.at : Date.now() - tl.wang);
+    cards.forEach(function (card) { if (card.dataset.category === '3') stamp(card, noticeAt(card.dataset.message)); });
+    var sender = state.chat.slice().reverse().find(function (item) { return !item.self && item.senderName; });
+    cards[0].querySelector('.message-row-head strong').textContent = sender ? sender.senderName : '王经理';
+    cards[0].querySelector('.message-source').textContent = '物业人员 · ' + state.context;
     Object.keys(consultants).forEach(function (id) {
       var config = consultants[id], thread = state.consultants[id];
       cards[id].querySelector('.message-preview').textContent = thread && thread.chat.length ? thread.chat[thread.chat.length - 1].text : config.messages[config.messages.length - 1];
-      cards[id].querySelector('time').textContent = thread && thread.chat.length ? '最近' : examples[id - 4][2];
+      var last = thread && thread.chat.length ? thread.chat[thread.chat.length - 1] : null;
+      stamp(cards[id], last && last.at ? last.at : Date.now() - (tl[id] || DAY));
+      cards[id].parentElement.hidden = (tl.hide || []).indexOf(Number(id)) >= 0;
     });
     window.__syncMessageUnread();
     syncCategoryLists();
+    syncClear();
   }
-  var categoryNames = ['咨询', '空间', '预约', '通知'];
-  var categoryIcons = ['consultation', 'space', 'booking', 'notice'];
-  var categoryRoutes = ['message-consultations', 'message-space-list', 'message-booking-list', 'message-notice-list'];
-  var categoryTitles = ['咨询消息', '空间动态', '预约消息', '园区通知'];
+  var categoryRoutes = ['message-consultations', 'message-other-list', 'message-booking-list', 'message-notice-list'];
+  var categoryTitles = ['咨询消息', '其他消息', '预约消息', '园区通知'];
   var detailRoutes = ['leasing-chat', 'message-space', 'message-booking', 'message-notice'];
   var detailTitles = ['招商咨询', '空间动态', '预约进度', '园区服务通知'];
   var categories = document.createElement('div'); categories.className = 'message-categories';
-  categories.setAttribute('role', 'group'); categories.setAttribute('aria-label', '消息分类');
-  categories.innerHTML = categoryNames.map(function (name, index) {
-    cards[index].dataset.category = String(index);
-    return '<button type="button" data-category="' + index + '" aria-controls="' + categoryRoutes[index] + '"><span class="category-icon"><img src="miniprogram/assets/icons/message-' + categoryIcons[index] + '.svg" alt="" aria-hidden="true"><b hidden></b></span><span>' + name + '</span></button>';
-  }).join('');
+  categories.setAttribute('role', 'group'); categories.setAttribute('aria-label', '通知入口');
+  cards.forEach(function (card, index) { card.dataset.category = String(index); });
+  categories.innerHTML = '<button type="button" class="message-card" data-category="3" aria-controls="message-notice-list"><span class="category-icon" aria-hidden="true"><img src="miniprogram/assets/icons/message-notice.svg?v=20261009-white" alt=""><b hidden></b></span><span class="message-copy"><span class="message-row-head"><strong>通知</strong><time></time></span><span class="message-preview"></span></span></button>';
   list.prepend(categories);
   categories.onclick = function (event) {
     var button = event.target.closest('[data-category]');
@@ -111,14 +158,14 @@
   // Additional local examples share the inbox read state and category routes.
   var examples = [
     [0, '李顾问', '10:10', 'B 座办公选址咨询', '已整理180m²办公空间的布局要点，可根据团队规模进一步沟通。', '建议先确认工位数量、独立会议室和预计入驻时间，再安排现场看房。'],
-    [0, '陈顾问', '昨天', '入驻材料咨询', '企业入驻材料清单已整理，您可以先核对基础资料。', '示例清单包含企业基本信息、空间需求和联系人资料。正式材料要求以园区审核通知为准。'],
+    [0, '陈顾问', '昨天', '入驻材料咨询', '企业入驻材料清单已整理，您可以先核对基础资料。', '入驻材料清单包含企业基本信息、空间需求和联系人资料。正式材料要求以园区审核通知为准。'],
     [0, '园区服务专员', '10-06', '园区配套咨询', '关于停车、餐饮和会议室的咨询，已整理服务说明。', '停车、餐饮和会议室可从企业服务入口了解；实际开放范围和使用条件以园区确认结果为准。'],
-    [1, '空间动态', '09:40', 'B 座 · 180m² 创新办公', '独立办公户型资料已更新，可查看空间布局与采光信息。', '适合关注独立办公布局的团队，建议结合工位和会议需求现场核实；本条为示例动态，不代表实时房源。'],
+    [1, '空间动态', '09:40', 'B 座 · 180m² 创新办公', '独立办公户型资料已更新，可查看空间布局与采光信息。', '适合关注独立办公布局的团队，建议结合工位和会议需求现场核实，房源状态以招商顾问确认为准。'],
     [1, '空间动态', '昨天', 'A 座 · 公共配套导览', '公共会议区与洽谈区导览信息已补充。', '看房时可同步了解公共会议区、接待区和通行动线，使用权限与收费以正式说明为准。'],
-    [1, '空间动态', '10-05', '办公空间选址提示', '选址前可先整理面积、预算及预计入驻时间。', '将核心需求提供给招商顾问，有助于筛选匹配空间。页面展示信息仅供原型体验。'],
-    [2, '预约进度', '09:20', 'B 座看房 · 待沟通时间', '已收到看房意向，具体到访时间待双方沟通。', '示例状态：待沟通。请勿据此直接到访；正式接待时间、人数和联系人需经园区确认。'],
-    [2, '预约进度', '昨天', '会议室参观 · 信息待补充', '参观需求还需补充预计人数及使用场景。', '示例状态：待补充。补全预计人数、希望了解的设施及参观时段后，再与服务人员确认安排。'],
-    [2, '预约进度', '10-04', '园区导览 · 已结束', '本次示例导览记录已结束，可继续咨询入驻问题。', '示例状态：已结束。可整理对空间、配套和入驻流程的疑问继续咨询，本条不代表真实到访记录。'],
+    [1, '空间动态', '10-05', '办公空间选址提示', '选址前可先整理面积、预算及预计入驻时间。', '将核心需求提供给招商顾问，有助于筛选匹配空间。'],
+    [2, '预约进度', '09:20', 'B 座看房 · 待沟通时间', '已收到看房意向，具体到访时间待双方沟通。', '当前状态：待沟通。请勿据此直接到访；正式接待时间、人数和联系人需经园区确认。'],
+    [2, '预约进度', '昨天', '会议室参观 · 信息待补充', '参观需求还需补充预计人数及使用场景。', '当前状态：待补充。补全预计人数、希望了解的设施及参观时段后，再与服务人员确认安排。'],
+    [2, '预约进度', '10-04', '园区导览 · 已结束', '本次园区导览已结束，可继续咨询入驻问题。', '当前状态：已结束。可整理对空间、配套和入驻流程的疑问继续咨询。'],
     [3, '园区服务', '09:00', '消防演练温馨提示', '请留意园区消防演练安排，提前了解疏散通道。', '演练期间请听从现场工作人员引导，不占用消防通道。具体演练日期与范围以正式公告为准。'],
     [3, '园区服务', '昨天', '公共会议室使用提醒', '使用结束后请带走随身物品，并保持会议室整洁。', '如发现设备异常，请联系园区服务人员。预约、取消及费用规则以正式服务说明为准。'],
     [3, '园区服务', '10-03', '停车与通行提示', '来访前请了解车辆登记与园区通行要求。', '访客车辆请按园区正式指引完成登记，停车区域、收费与门禁权限以现场公示为准。']
@@ -147,20 +194,34 @@
       detailRoutes[index] = consultants[index].route; detailTitles[index] = item[1];
       return;
     }
-    detailRoutes[index] = route; detailTitles[index] = item[3];
-    var detail = page(route, item[3], '<article class="journey-panel"><span class="journey-kicker">示例消息</span><h1></h1><p class="journey-meta"></p><h2>消息内容</h2><p data-example-summary></p><p data-example-body></p></article>');
+    var isNotice = item[0] === 3;
+    detailRoutes[index] = route; detailTitles[index] = isNotice ? '园区服务通知' : item[3];
+    var detail = page(route, detailTitles[index], '<article class="journey-panel"><span class="journey-kicker">' + categoryTitles[item[0]] + '</span><h1></h1><p class="journey-meta"></p><h2>消息内容</h2><p data-example-summary></p><p data-example-body></p></article>');
     detail.querySelector('h1').textContent = item[3];
-    detail.querySelector('.journey-meta').textContent = item[1] + ' · ' + item[2] + ' · 仅供原型体验';
+    detail.querySelector('.journey-meta').textContent = item[1] + ' · ' + item[2];
+    if (isNotice) {
+      detail.classList.add('message-notice-detail');
+      detail.querySelector('.journey-kicker').textContent = '园区服务';
+      detail.querySelector('.journey-meta').textContent = '园区服务中心';
+      detail.querySelector('h2').remove();
+    }
     detail.querySelector('[data-example-summary]').textContent = item[4];
     detail.querySelector('[data-example-body]').textContent = item[5];
   });
-  list.querySelector('#message-conversations-title span').textContent = '8 条消息';
-  list.querySelector('#message-notices-title span').textContent = '8 条消息';
+  cards.forEach(function (card, index) {
+    var conversation = index === 0 || !!consultants[index];
+    card.parentElement.hidden = !conversation;
+    if (!conversation && card.dataset.category !== '3') card.dataset.messageRetired = 'true';
+  });
+  list.querySelector('#message-conversations-title').firstChild.textContent = '对话';
+  list.querySelector('#message-conversations-title span').textContent = '3 个会话';
+  list.querySelector('#message-notices-title').hidden = true;
+  list.querySelector('#message-notices-title').nextElementSibling.hidden = true;
   var categoryContent = [
-    '<span class="category-person" aria-hidden="true"><img class="manager-avatar-image" src="miniprogram/assets/manager-wang.png" alt=""></span><span class="category-copy"><span class="category-row"><strong>王经理</strong><time data-list-time></time></span><span class="category-context" data-list-context></span><span class="category-preview" data-list-preview></span><span class="category-unread" data-list-unread>未读</span></span>',
-    '<span class="category-row"><span class="category-kind"><i data-lucide="building-2" aria-hidden="true"></i>空间更新</span><time data-list-time></time></span><span class="category-space-body"><img src="miniprogram/assets/spaces/space-card-1.png.webp" alt="A 座研发办公空间"><span class="category-copy"><strong>A 座 · 320m² 研发办公</strong><span class="category-context">星桥科创园</span><span class="category-preview" data-list-preview></span></span></span><span class="category-footer"><span class="category-unread" data-list-unread>未读</span><span class="category-link">查看空间动态 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
-    '<span class="category-row"><span class="category-kind"><i data-lucide="calendar-check" aria-hidden="true"></i>看房预约</span><time data-list-time></time></span><strong>等待园区确认</strong><span class="category-context">A 座 · 320m² 研发办公</span><span class="category-progress"><span>申请已提交</span><i data-lucide="arrow-right" aria-hidden="true"></i><b>待确认</b></span><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread>未读</span><span class="category-link">查看预约进度 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
-    '<span class="category-row"><span class="category-kind"><i data-lucide="bell" aria-hidden="true"></i>园区服务中心</span><time data-list-time></time></span><strong>中秋节园区服务安排</strong><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread>未读</span><span class="category-link">阅读全文 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>'
+    '<span class="category-person" aria-hidden="true"><img class="manager-avatar-image" src="miniprogram/assets/manager-wang.png" alt=""></span><span class="category-copy"><span class="category-row"><strong>王经理</strong><time data-list-time></time></span><span class="category-context" data-list-context></span><span class="category-preview" data-list-preview></span><span class="category-unread" data-list-unread aria-hidden="true"></span></span>',
+    '<span class="category-row"><span class="category-kind"><i data-lucide="building-2" aria-hidden="true"></i>空间更新</span><time data-list-time></time></span><span class="category-space-body"><img src="miniprogram/assets/spaces/space-card-1.png.webp" alt="A 座研发办公空间"><span class="category-copy"><strong>A 座 · 320m² 研发办公</strong><span class="category-context">星桥科创园</span><span class="category-preview" data-list-preview></span></span></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">查看空间动态 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
+    '<span class="category-row"><span class="category-kind"><i data-lucide="calendar-check" aria-hidden="true"></i>看房预约</span><time data-list-time></time></span><strong>等待园区确认</strong><span class="category-context">A 座 · 320m² 研发办公</span><span class="category-progress"><span>申请已提交</span><i data-lucide="arrow-right" aria-hidden="true"></i><b>待确认</b></span><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">查看预约进度 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
+    '<span class="category-row"><span class="category-kind"><i data-lucide="bell" aria-hidden="true"></i>园区服务中心</span><time data-list-time></time></span><strong>中秋节园区服务安排</strong><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">阅读全文 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>'
   ];
   var categoryPages = categoryRoutes.map(function (id, category) {
     var node = page(id, categoryTitles[category], '<ul class="category-message-list" aria-label="' + categoryTitles[category] + '"></ul>');
@@ -173,7 +234,7 @@
         var item = examples[index - 4];
         li.querySelector('strong').textContent = category === 0 ? item[1] : item[3];
         var person = li.querySelector('.category-person'); if (person) person.innerHTML = consultantAvatar(item[1]);
-        var context = li.querySelector('.category-context'); if (context) context.textContent = consultants[index] ? consultants[index].source : item[3] + ' · 示例';
+        var context = li.querySelector('.category-context'); if (context) context.textContent = consultants[index] ? consultants[index].source : item[3];
         var progress = li.querySelector('.category-progress'); if (progress) progress.textContent = item[3].split(' · ')[1];
         var image = li.querySelector('.category-space-body img');
         if (image) image.remove();
@@ -187,12 +248,17 @@
     return node;
   });
   function syncCategoryLists() {
-    categories.querySelectorAll('button').forEach(function (button, category) {
-      var count = cards.filter(function (card) { return Number(card.dataset.category) === category && card.querySelector('.message-unread'); }).length;
-      button.querySelector('b').hidden = !count;
-      button.querySelector('b').textContent = String(count);
-      button.setAttribute('aria-label', categoryTitles[category] + (count ? '，' + count + ' 条未读' : '，无未读消息'));
-      categoryPages[category].querySelectorAll('[data-category-message]').forEach(function (node) {
+    var notice = categories.querySelector('button');
+    var count = cards.filter(function (card) { return card.dataset.category === '3' && card.querySelector('.message-unread'); }).length;
+    notice.querySelector('b').hidden = !count;
+    notice.querySelector('b').textContent = String(count);
+    var latest = cards.filter(function (card) { return card.dataset.category === '3'; }).sort(function (a, b) { return Number(b.dataset.at || 0) - Number(a.dataset.at || 0); })[0];
+    notice.dataset.at = latest.dataset.at || '0'; notice.querySelector('time').textContent = latest.querySelector('time').textContent;
+    notice.querySelector('.message-preview').textContent = latest.querySelector('.message-preview').textContent;
+    notice.setAttribute('aria-label', categoryTitles[3] + (count ? '，' + count + ' 条未读' : '，无未读消息'));
+    // Hidden category shortcuts do not stop their existing lists from syncing.
+    categoryPages.forEach(function (page) {
+      page.querySelectorAll('[data-category-message]').forEach(function (node) {
         var index = Number(node.dataset.categoryMessage);
         var card = cards[index];
         var unread = !!card.querySelector('.message-unread');
@@ -204,6 +270,80 @@
       });
     });
   }
+  var otherDetail = page('message-other-detail', '消息记录', '');
+  function textNode(tag, text, className) {
+    var node = document.createElement(tag); node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+  function recordDate(value) {
+    var date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+  }
+  function openOtherRecord(record, type, parent) {
+    otherDetail.replaceChildren();
+    var article = document.createElement('article'); article.className = 'journey-panel';
+    article.append(textNode('h1', type === 'chat' ? '智能客服聊天记录' : record.title), textNode('p', recordDate(record.archivedAt || record.created), 'journey-meta'));
+    if (type === 'chat') {
+      article.append(textNode('p', '会话已结束 · 超过24小时没有新对话', 'journey-meta'));
+      record.records.forEach(function (item) { article.append(textNode('h2', '我'), textNode('p', item.question), textNode('h2', '智能客服'), textNode('p', item.answer)); });
+    } else {
+      article.append(textNode('p', record.state || '已保存', 'journey-meta'));
+      (record.fields || []).forEach(function (pair) { article.append(textNode('h2', pair[0]), textNode('p', pair[1])); });
+    }
+    otherDetail.appendChild(article);
+    window.__setMiniRoute(otherDetail.id, type === 'chat' ? '聊天记录' : '反馈记录', parent || 'message-other-list');
+    window.__showMiniPage(otherDetail.id);
+  }
+  // Each smart-service conversation is its own inbox row, opening straight into the chat like other conversations.
+  var smartEntry = document.createElement('div'); smartEntry.className = 'message-smart-entry';
+  categories.after(smartEntry);
+  function smartRow(preview, at, open) {
+    var button = document.createElement('button'); button.type = 'button'; button.className = 'message-card';
+    button.innerHTML = '<span class="category-icon message-smart-avatar" aria-hidden="true"><img src="miniprogram/assets/icons/message-smart.svg?v=20261015" alt=""></span><span class="message-copy"><span class="message-row-head"><strong>智能客服</strong><time></time></span><span class="message-preview"></span></span>';
+    stamp(button, at); button.querySelector('.message-preview').textContent = preview;
+    button.onclick = function () { window.__setMiniRoute('smart-service', '智能客服', 'messages'); open(); window.__showMiniPage('smart-service'); };
+    smartEntry.appendChild(button);
+  }
+  function syncSmartRecords() {
+    if (!window.__smartService) return;
+    var api = window.__smartService, data = api.conversation();
+    smartEntry.replaceChildren();
+    if (data.records.length || !data.archives.length) smartRow(data.records.length ? data.records[data.records.length - 1].question : '暂无对话记录，点击开始咨询', data.lastActivity, api.openCurrent);
+    data.archives.map(function (record, index) { return { record: record, index: index }; }).filter(function (item) { return item.record && Array.isArray(item.record.records) && item.record.records.length; }).reverse().forEach(function (item) {
+      smartRow(item.record.records[item.record.records.length - 1].question, item.record.lastActivity || item.record.archivedAt, function () { api.openArchive(item.index); });
+    });
+  }
+  window.addEventListener('park-smart-records-changed', syncSmartRecords);
+  window.addEventListener('park-smart-archives-changed', syncSmartRecords);
+  new MutationObserver(syncSmartRecords).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
+  new MutationObserver(function () { if (!list.classList.contains('hidden')) syncSmartRecords(); }).observe(list, { attributes: true, attributeFilter: ['class'] });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncSmartRecords); else syncSmartRecords();
+  var syncingOther = false;
+  function syncOtherRecords() {
+    if (syncingOther) return;
+    syncingOther = true;
+    try {
+      var ul = categoryPages[1].querySelector('ul');
+      ul.querySelectorAll('[data-other-record]').forEach(function (node) { node.remove(); });
+      var role = profile.dataset.role || 'guest';
+      var archives = window.__smartService ? window.__smartService.listArchives().filter(function (record) { return record && Array.isArray(record.records) && record.records.length; }) : [];
+      var feedback = window.MiniStore ? MiniStore.data.feedback.filter(function (record) { return record.owner === role || (!record.owner && role === 'guest'); }) : [];
+      var entries = archives.map(function (record) { return { record: record, type: 'chat', at: record.archivedAt }; }).concat(feedback.map(function (record) { return { record: record, type: 'feedback', at: record.created }; }));
+      entries.sort(function (a, b) { return new Date(b.at) - new Date(a.at); });
+      entries.reverse().forEach(function (entry) {
+        var li = document.createElement('li'); li.dataset.otherRecord = entry.type;
+        var button = document.createElement('button'); button.type = 'button'; button.className = 'category-entry category-other-record';
+        var record = entry.record, last = entry.type === 'chat' ? record.records[record.records.length - 1] : null;
+        button.append(textNode('span', entry.type === 'chat' ? '智能客服 · 聊天记录' : '服务反馈 · ' + record.title, 'category-kind'), textNode('time', recordDate(entry.at)), textNode('strong', entry.type === 'chat' ? last.question : record.title), textNode('span', entry.type === 'chat' ? '会话已结束，查看完整聊天记录' : record.state || '已保存', 'category-preview'));
+        button.onclick = function () { openOtherRecord(record, entry.type); }; li.appendChild(button); ul.prepend(li);
+      });
+    } finally { syncingOther = false; }
+  }
+  new MutationObserver(function () { if (!categoryPages[1].classList.contains('hidden')) syncOtherRecords(); }).observe(categoryPages[1], { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(syncOtherRecords).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
+  window.addEventListener('park-smart-archives-changed', syncOtherRecords);
+  window.addEventListener('park-feedback-saved', syncOtherRecords);
   list.addEventListener('message-read-change', function () {
     state.read = cards.filter(function (card) { return !card.querySelector('.message-unread'); }).map(function (card) { return card.dataset.message; });
     save(); syncCategoryLists();
@@ -214,8 +354,7 @@
       consultantPages[index].refresh();
     }
     if (index === 0 && !state.chat.length) {
-      var start = Date.now() - conversation.length * 120000;
-      state.chat = conversation.map(function (item, i) { return Object.assign({}, item, { at: start + i * 120000 }); });
+      state.chat = window.__messageJourney.sampleHistory();
       document.getElementById('leasing-chat').dispatchEvent(new Event('message-history-ready'));
     }
     if (!state.read.includes(cards[index].dataset.message)) state.read.push(cards[index].dataset.message);
@@ -226,7 +365,7 @@
   function icons() { if (window.lucide) lucide.createIcons(); }
   function consultantThread(id) {
     if (!state.consultants[id]) {
-      var start = Date.now() - 16 * 60000;
+      var start = Date.now() - (timeline()[id] || 16 * MIN) - (consultants[id].messages.length - 1) * 120000;
       state.consultants[id] = { draft: '', unread: false, chat: consultants[id].messages.map(function (text, i) {
         return { text: text, self: i % 2 === 0, at: start + i * 120000 };
       }) };
@@ -293,11 +432,12 @@
     var node = document.createElement('section'); node.id = id; node.className = 'hidden message-detail-page';
     node.innerHTML = content; screen.appendChild(node); window.__setMiniRoute(id, title, 'messages'); return node;
   }
-  page('message-space', '空间动态', '<article class="journey-panel"><span class="journey-kicker">空间更新</span><h1>A 座研发办公空间</h1><p class="journey-meta">星桥科创园 · 示例动态</p><img class="journey-cover" src="miniprogram/assets/spaces/space-card-1.png.webp" alt="研发办公空间示意"><h2>了解空间，安排下一步</h2><p>320m² 研发办公空间，精装修、南向。可租状态、价格与接待时间需由园区工作人员确认。</p><dl><div><dt>关注空间</dt><dd>A 座 · 320m²</dd></div><div><dt>沟通方式</dt><dd>在线咨询</dd></div></dl></article><div class="journey-actions"><button data-page="spaces">浏览招商空间</button><button class="journey-primary" data-journey-chat>咨询顾问</button></div>');
-  page('message-booking', '预约进度', '<article class="journey-panel"><span class="journey-kicker">看房预约 · 示例记录</span><h1>等待园区确认</h1><p>当前展示预约提交后的待确认状态，并非您的真实预约。</p><dl><div><dt>意向空间</dt><dd>A 座 · 320m² 研发办公</dd></div><div><dt>到访时间</dt><dd>待双方协商</dd></div><div><dt>接待人员</dt><dd>待园区安排</dd></div></dl><h2>处理进度</h2><ol class="journey-timeline"><li class="done"><b>提交申请</b><p>已填写意向空间与到访需求（示例）</p></li><li class="current"><b>等待确认</b><p>接待人员确认时间后，将发送预约通知。</p></li><li><b>按约到访</b><p>收到确认后，再根据入园指引安排出行。</p></li></ol></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询预约安排</button><button data-page="message-booking-help">了解预约流程</button></div>');
-  page('message-booking-help', '预约指引', '<article class="journey-panel"><h1>预约前，准备这些信息</h1><ol class="journey-guide"><li><b>选择空间</b><p>明确面积、用途及预计入驻时间。</p></li><li><b>确认到访安排</b><p>与园区确认日期、人数、联系人和接待地点。</p></li><li><b>等待确认通知</b><p>申请不等于预约成功。收到正式确认后再安排到访。</p></li></ol><p>当前原型不提交真实申请，也不收集联系人信息。</p></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询顾问</button></div>');
+  page('message-space', '空间动态', '<article class="journey-panel"><span class="journey-kicker">空间更新</span><h1>A 座研发办公空间</h1><p class="journey-meta">星桥科创园 · 空间动态</p><img class="journey-cover" src="miniprogram/assets/spaces/space-card-1.png.webp" alt="A 座研发办公空间"><h2>了解空间，安排下一步</h2><p>320m² 研发办公空间，精装修、南向。可租状态、价格与接待时间需由园区工作人员确认。</p><dl><div><dt>关注空间</dt><dd>A 座 · 320m²</dd></div><div><dt>沟通方式</dt><dd>在线咨询</dd></div></dl></article><div class="journey-actions"><button data-page="spaces">浏览招商空间</button><button class="journey-primary" data-journey-chat>咨询顾问</button></div>');
+  page('message-booking', '预约进度', '<article class="journey-panel"><span class="journey-kicker">看房预约</span><h1>等待园区确认</h1><p>预约申请已提交，等待园区工作人员确认。</p><dl><div><dt>意向空间</dt><dd>A 座 · 320m² 研发办公</dd></div><div><dt>到访时间</dt><dd>待双方协商</dd></div><div><dt>接待人员</dt><dd>待园区安排</dd></div></dl><h2>处理进度</h2><ol class="journey-timeline"><li class="done"><b>提交申请</b><p>已填写意向空间与到访需求</p></li><li class="current"><b>等待确认</b><p>接待人员确认时间后，将发送预约通知。</p></li><li><b>按约到访</b><p>收到确认后，再根据入园指引安排出行。</p></li></ol></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询预约安排</button><button data-page="message-booking-help">了解预约流程</button></div>');
+  page('message-booking-help', '预约指引', '<article class="journey-panel"><h1>预约前，准备这些信息</h1><ol class="journey-guide"><li><b>选择空间</b><p>明确面积、用途及预计入驻时间。</p></li><li><b>确认到访安排</b><p>与园区确认日期、人数、联系人和接待地点。</p></li><li><b>等待确认通知</b><p>申请不等于预约成功。收到正式确认后再安排到访。</p></li></ol></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询顾问</button></div>');
   window.__setMiniRoute('message-booking-help', '预约指引', 'message-booking');
-  page('message-notice', '园区服务通知', '<article class="journey-panel"><span class="journey-kicker">园区服务</span><h1>节假日园区服务安排</h1><p class="journey-meta">园区服务中心 · 示例公告</p><p>节假日到访或办公前，请提前了解园区各项服务安排。</p><h2>门禁与通行</h2><p>请按园区通行要求办理登记。具体开放时段以正式公告为准。</p><h2>餐厅与物业</h2><p>餐厅营业及物业值班时间待正式资料配置，当前不提供未经确认的时间或联系电话。</p><h2>需要帮助？</h2><p>可从企业服务入口查看现有服务，涉及身份验证的功能按原有权限规则处理。</p></article><div class="journey-actions"><button data-page="enterprise-services" class="journey-primary">查看企业服务</button><button data-page="messages">返回消息</button></div>');
+  page('message-notice', '园区服务通知', '<article class="journey-panel"><span class="journey-kicker">园区服务</span><h1>节假日园区服务安排</h1><p class="journey-meta">园区服务中心</p><p>节假日到访或办公前，请提前了解园区各项服务安排。</p><h2>门禁与通行</h2><p>请按园区通行要求办理登记。具体开放时段以正式公告为准。</p><h2>餐厅与物业</h2><p>餐厅营业及物业值班时间待正式资料配置，当前不提供未经确认的时间或联系电话。</p><h2>需要帮助？</h2><p>可从企业服务入口查看现有服务，涉及身份验证的功能按原有权限规则处理。</p></article>');
+  document.getElementById('message-notice').classList.add('message-notice-detail');
   function chat(parent) {
     window.__setMiniRoute('leasing-chat', '招商咨询', parent);
     window.__showMiniPage('leasing-chat');
@@ -317,11 +457,17 @@
     save(); render(); chat('space-detail');
   };
   window.__messageJourney = {
+    manualReply: true,
+    setContext: function (value) { state.context = String(value || '园区咨询').slice(0, 120); save(); render(); },
+    sampleHistory: function (role) { var end = Date.now() - timeline(role).wang; return conversation.map(function (item, i) { return Object.assign({}, item, { at: end - (conversation.length - 1 - i) * 120000 }); }); },
     history: function () { return state.chat; },
     append: function (text, self, link) {
+      if (profile.dataset.role === 'property') return false;
+      if (!state.chat.length) state.chat = window.__messageJourney.sampleHistory();
       state.chat.push({ text: text, self: self, link: link, at: Date.now() }); state.draft = '';
       if (!self && document.getElementById('leasing-chat').classList.contains('hidden')) state.read = state.read.filter(function (id) { return id !== cards[0].dataset.message; });
       save(); render();
+      window.dispatchEvent(new Event('leasing-message-change'));
     }
   };
   load(); render(); icons();
@@ -341,5 +487,16 @@
   }
   // Load the role's history before the existing chat resets on a role switch.
   new MutationObserver(function () { load(); render(); }).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
+  // Notice, conversations and smart-service rows interleave by time, newest first (visual order via flex order).
+  function sortInbox() {
+    var rows = Array.prototype.filter.call(list.querySelectorAll('.message-card'), function (card) { return !card.closest('[hidden]'); });
+    rows.sort(function (a, b) { return Number(b.dataset.at || 0) - Number(a.dataset.at || 0); }).forEach(function (card, i, all) { card.style.order = String(i); card.classList.toggle('is-last', i === all.length - 1); });
+  }
+  var sortQueued = false;
+  new MutationObserver(function () {
+    if (sortQueued) return; sortQueued = true;
+    Promise.resolve().then(function () { sortQueued = false; sortInbox(); });
+  }).observe(list, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden', 'data-at'] });
+  sortInbox();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindChat); else bindChat();
 })();

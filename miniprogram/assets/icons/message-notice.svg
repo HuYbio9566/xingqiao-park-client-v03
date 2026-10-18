@@ -11,6 +11,6 @@
   <rect x=".5" y=".5" width="47" height="47" rx="13.5" stroke="white" stroke-opacity=".22"/>
   <g transform="translate(9 9) scale(1.25)" stroke-linecap="round" stroke-linejoin="round">
     <g fill="url(#porcelain)" stroke="white" stroke-opacity=".7" stroke-width=".6" filter="url(#relief)"><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326Z"/></g>
-    <g stroke="#1899b8" stroke-opacity=".72" stroke-width="1.6"><path d="M10.268 21a2 2 0 0 0 3.464 0"/></g>
+    <g stroke="white" stroke-width="1.6"><path d="M10.268 21a2 2 0 0 0 3.464 0"/></g>
   </g>
 </svg>

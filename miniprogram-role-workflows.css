@@ -1,0 +1,181 @@
+#profile .mp-my-services[hidden],#profile [hidden]{display:none!important}
+#profile .mp-todo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.role-section-title{margin:0 0 16px;font-size:14px;color:var(--text)}
+#profile .mp-my-services .role-section-title,#profile [data-profile-todos] .role-section-title{margin:0 0 12px;font-size:16px;line-height:24px}
+#profile .mp-section-card[data-profile-todos]{height:auto;padding:12px}
+#profile [data-profile-todos] .mp-todo-grid{padding:0}
+#profile .property-workbench .mp-service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#profile .mp-section-card.property-workbench .mp-four-col>button.property-workbench-card[data-profile-entry]{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;min-width:0;padding:12px 12px 0;border:0;border-radius:var(--r-md);background:#eef5f1;color:var(--text);text-align:left;cursor:pointer}
+#profile .property-workbench-head{display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px}
+#profile .mp-section-card.property-workbench .mp-four-col .property-workbench-head .mp-icon-box{flex:none;width:32px;height:32px;margin:0;background:var(--brand);border-radius:8px;color:#fff}
+#profile .property-workbench-head svg{width:20px;height:20px}
+#profile .property-workbench-head>svg{flex:none;width:16px;height:16px;margin-left:auto;color:var(--muted)}
+#profile .property-workbench-summary{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:12px 0;color:var(--muted);font-size:12px;line-height:20px}
+#profile .property-workbench-summary>span{position:relative;top:-.1em}
+#profile .property-count{color:var(--brand);font-size:28px;line-height:32px;font-variant-numeric:tabular-nums}
+#profile .property-count-empty{color:var(--muted)}
+#profile .property-workbench-action{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:40px;border-top:var(--divider-width) solid var(--line);color:var(--muted);font-size:12px;line-height:20px}
+#profile .property-workbench-action>svg{display:block;flex:none;width:16px;height:16px}
+#profile .property-workbench-card:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.role-workflow{display:grid;gap:12px;min-width:0}
+.role-workflow.hidden{display:none}
+.screen #role-repairs.property-repair-page{padding:0;display:block}
+.screen #role-repairs.property-repair-page.hidden{display:none}
+#role-repairs .repair-status-tabs{display:flex;height:44px;background:var(--surface,#fff);border-bottom:var(--divider-width) solid var(--line)}
+#role-repairs .repair-status-tabs button{position:relative;flex:1;height:44px;min-height:44px;padding:0;border:0;background:none;color:var(--muted);font:inherit;font-size:14px;cursor:pointer}
+#role-repairs .repair-status-tabs button[aria-selected=true]{color:var(--brand);font-weight:600}
+#role-repairs .repair-status-tabs button[aria-selected=true]:after{content:"";position:absolute;bottom:0;left:calc(50% - 12px);width:24px;height:2px;border-radius:2px;background:var(--brand)}
+#role-repairs .repair-status-tabs button:focus-visible{outline:2px solid var(--brand);outline-offset:-4px;border-radius:4px}
+#role-repairs .repair-status-content{display:grid;gap:12px;padding:16px}
+.role-workflow h1{margin:0;font-size:20px}.role-workflow h2{font-size:16px;margin:0 0 12px}
+.role-workflow p{font-size:14px;line-height:1.7;margin:8px 0;color:var(--muted)}
+.role-panel{padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface,#fff);min-width:0;overflow-wrap:anywhere}
+#role-approvals .role-panel{border:0}
+#role-approvals{padding:0 0 24px}
+.approval-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));height:44px;margin-top:0;background:#fff;border-bottom:var(--divider-width) solid var(--line)}
+.approval-tabs button{position:relative;height:44px;padding:0;border:0;background:#fff;color:var(--muted);font:inherit;font-size:14px;cursor:pointer}
+.approval-tabs button.active{color:var(--brand);font-weight:600}
+.approval-tabs button.active:after{content:"";position:absolute;right:20%;bottom:0;left:20%;height:2px;border-radius:2px;background:var(--brand)}
+#role-approvals .role-panel,#role-approvals .role-empty,#role-approvals>h2{margin-right:16px;margin-left:16px}
+#role-approvals .role-panel:first-of-type{margin-top:8px}
+.screen #role-bills.bill-ledger{padding:0 0 24px;gap:8px}
+.bill-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));height:44px;background:#fff}
+.bill-tabs button{position:relative;min-width:0;height:44px;padding:0;border:0;background:#fff;color:var(--muted);font:inherit;font-size:14px;cursor:pointer}
+.bill-tabs button[aria-pressed=true]{color:var(--brand);font-weight:600}
+.bill-tabs button[aria-pressed=true]:after{content:"";position:absolute;right:20%;bottom:0;left:20%;height:2px;border-radius:2px;background:var(--brand)}
+#role-bills.bill-ledger>.role-panel{margin:0 16px}
+.screen #role-bills.bill-enterprise{padding:0;gap:0}
+/* Only the visible page becomes flex, so .hidden keeps working. */
+.screen #role-bills.bill-enterprise:not(.hidden){display:flex;flex-direction:column}
+#role-bills.bill-enterprise>.bill-notice,#role-bills.bill-enterprise>.bill-enterprise-tabs{flex:none}
+#role-bills.bill-enterprise>.bill-enterprise-content{flex:1 0 auto;display:grid;align-content:start;gap:12px;padding:var(--page-gutter)}
+#role-bills.bill-enterprise>.bill-enterprise-content>.role-panel{margin:0}
+.bill-enterprise-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:44px;background:#fff;border-bottom:var(--divider-width) solid var(--line)}
+.bill-enterprise-tabs button{position:relative;min-width:0;height:44px;padding:0;border:0;background:#fff;color:var(--muted);font:inherit;font-size:14px;cursor:pointer}
+.bill-enterprise-tabs button[aria-pressed=true]{color:var(--brand);font-weight:600}
+.bill-enterprise-tabs button[aria-pressed=true]:after{content:"";position:absolute;right:20%;bottom:0;left:20%;height:2px;border-radius:2px;background:var(--brand)}
+.bill-notice{display:flex;align-items:center;height:36px;padding-left:16px;background:#fff8e1;color:#d48806;font-size:12px;line-height:36px;overflow:hidden}
+.bill-notice-track{flex:1;min-width:0;overflow:hidden;white-space:nowrap}
+.bill-notice-track>span{display:inline-block;padding-left:100%;animation:bill-notice-marquee 14s linear infinite}
+.bill-notice-close{flex:none;display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;background:none;color:#d48806;cursor:pointer}
+.bill-notice-close svg{width:14px;height:14px}
+@keyframes bill-notice-marquee{to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.bill-notice-track>span{padding-left:0;animation:none;white-space:normal}}
+.role-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.role-row strong{font-size:14px}
+.role-status{font-size:12px;color:var(--brand);flex-shrink:0}.role-meta{font-size:12px;color:var(--muted)}
+.role-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.role-actions button,.role-filter button{min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--brand);font:inherit;font-size:14px;cursor:pointer}
+.role-actions .role-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.role-filter{display:flex;flex-wrap:wrap;gap:8px}.role-filter button[aria-pressed=true]{background:var(--brand);color:#fff}
+.role-workflow label{display:grid;gap:8px;font-size:14px;margin:12px 0}
+.role-workflow input,.role-workflow select,.role-workflow textarea{width:100%;box-sizing:border-box;min-height:44px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px}
+.role-workflow textarea{min-height:96px;resize:vertical}.role-workflow dl{margin:0}.role-workflow dt{font-size:12px;color:var(--muted);margin-top:12px}.role-workflow dd{margin:4px 0;font-size:14px;white-space:pre-wrap}
+.role-timeline{padding-left:20px;color:var(--muted);font-size:14px;line-height:1.8}.role-timeline .done{color:var(--brand)}
+.role-feedback{font-size:14px;color:var(--brand);line-height:1.7}.role-feedback:empty{display:none}
+.role-empty{padding:24px 16px;text-align:center;color:var(--muted)}
+.role-workflow button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.role-permission-modal{position:absolute;inset:0;z-index:90;display:grid;place-items:center;padding:24px;background:rgba(24,36,31,.32);backdrop-filter:blur(4px)}
+.role-permission-modal.hidden{display:none}
+.role-permission-card{position:relative;width:100%;max-width:320px;max-height:100%;overflow:auto;padding:32px 24px 24px;border-radius:24px;background:var(--surface);box-shadow:0 16px 48px rgba(24,36,31,.16);text-align:center;animation:permission-arrive .2s cubic-bezier(.2,.8,.2,1)}
+.role-permission-icon{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 20px;border-radius:var(--r-lg);background:var(--soft);color:var(--brand)}
+.role-permission-icon svg{width:28px;height:28px;stroke-width:1.8}
+.role-permission-card h2{margin:0;font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-.02em;text-wrap:balance}
+.role-permission-card p{margin:12px 0 0;color:var(--muted);font-size:14px;line-height:1.65}
+.role-permission-card .role-permission-help{margin:16px 0 24px;padding:12px;border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:12px;line-height:1.6}
+.role-permission-card .role-primary{width:100%;min-height:48px;padding:12px 16px;border:0;border-radius:var(--r-md);background:var(--brand);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.role-permission-close{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:24px;line-height:1;cursor:pointer}
+.role-permission-card button:active{filter:brightness(.92);transform:scale(.98)}
+.role-permission-card button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.role-login-modal{position:absolute;inset:0;z-index:91;display:grid;align-items:end;padding:0;background:rgba(24,36,31,.32);backdrop-filter:blur(4px)}
+.role-login-modal.hidden{display:none}
+.role-login-card{position:relative;box-sizing:border-box;width:100%;min-height:0;max-height:100%;overflow:auto;padding:32px 24px max(24px,env(safe-area-inset-bottom));border-radius:24px 24px 0 0;background:var(--surface);box-shadow:0 -8px 32px rgba(24,36,31,.12);text-align:left;animation:login-sheet-arrive .24s cubic-bezier(.2,.8,.2,1)}
+.role-login-icon{display:block;width:56px;height:56px;margin:0 0 20px;object-fit:contain;border-radius:var(--r-lg);background:var(--soft)}
+.role-login-card h2{margin:0;font-size:20px;font-weight:600;line-height:1.4}.role-login-card p{margin:12px 0 20px;color:var(--muted);font-size:14px;line-height:1.65}
+.role-login-card .role-primary,.role-login-one-tap{width:100%;min-height:48px;padding:12px 16px;border:0;border-radius:var(--r-md);background:var(--brand);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.role-login-card button:disabled{cursor:not-allowed;opacity:.45}
+.role-login-phone{width:100%;min-height:44px;margin-top:12px;padding:12px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:#fff;color:var(--brand);font:inherit;font-size:14px;cursor:pointer}
+.role-login-skip{display:block;width:100%;min-height:44px;margin:14px auto 18px;padding:0;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;cursor:pointer}
+.role-login-agreement{display:flex;align-items:flex-start;gap:8px;width:100%;min-height:24px;padding:0;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;line-height:24px;text-align:left;cursor:pointer}
+.role-login-checkbox{display:grid;place-items:center;flex:none;width:16px;height:16px;margin-top:4px;border:1px solid var(--line);border-radius:50%;color:#fff;background:#fff;font-size:12px;line-height:1}
+.role-login-agreement[aria-checked=true] .role-login-checkbox{border-color:var(--brand);background:var(--brand)}
+.role-login-close{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:24px;line-height:1;cursor:pointer}
+.role-login-close:focus-visible,.role-login-card button:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+@keyframes permission-arrive{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes login-sheet-arrive{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.role-login-card{animation:none}}
+@media(prefers-reduced-motion:reduce){.role-permission-card{animation:none}.role-permission-card button:active{transform:none}}
+@media(prefers-reduced-transparency:reduce){.role-permission-modal{backdrop-filter:none}}
+@media(prefers-contrast:more){.role-permission-card{outline:2px solid var(--text)}.role-permission-card p,.role-permission-close{color:var(--text)}}
+@media(max-width:520px){.phone{height:calc(100dvh - 56px)}}
+/* 申请详情：白底页 + 状态条 + 信息卡，与“我的服务”详情一致 */
+.screen #role-request-detail.request-detail-view{padding:var(--page-gutter);background:var(--surface)}
+.request-detail-banner{display:grid;gap:4px;padding:16px;border-radius:var(--r-md);background:var(--brand);color:#fff}
+.request-detail-banner strong{font-size:18px;line-height:24px}
+.request-detail-banner span{font-size:12px;opacity:.85}
+.request-detail-banner.is-closed{background:#eef0ef;color:var(--muted)}
+.request-detail-banner.is-closed span{opacity:1}
+.request-detail-fields{margin:0;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.request-detail-fields dt{margin-top:16px;font-size:12px;color:var(--muted)}
+.request-detail-fields dt:first-child{margin-top:0}
+.request-detail-fields dd{margin:8px 0 0;font-size:14px;line-height:1.7;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.request-detail-actions{display:grid;gap:12px}
+.request-detail-actions textarea{margin:0}
+.request-detail-actions .role-actions{margin-top:0;justify-content:flex-end}
+.request-detail-banner-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.request-detail-status{flex:none;padding:2px 12px;border-radius:12px;background:rgba(255,255,255,.18);font-size:12px;font-style:normal;line-height:20px}
+.request-detail-banner.is-closed .request-detail-status{background:#fff;color:var(--muted)}
+/* 企业审批 / 企业账单卡片：与物业工作台一致（左标签右内容 + 按钮右对齐，32px / 8px / 14px） */
+.role-workflow .approval-card{border:0}
+.role-workflow .approval-info-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:12px 0 0;font-size:14px;line-height:20px}
+.role-workflow .approval-info-grid dt{margin:0;color:var(--muted)}
+.role-workflow .approval-info-grid dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+.role-workflow .role-actions.approval-card-actions{justify-content:flex-end;margin-top:12px}
+.role-workflow .approval-card-actions button{min-height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-size:14px}
+.role-workflow .approval-card-actions button.role-primary{border-color:var(--brand);background:var(--brand);color:#fff}
+/* 账单详情：与申请详情同款白底页，撑满高度 */
+.screen #role-bill-detail.request-detail-view{min-height:100%;box-sizing:border-box;align-content:start;padding:var(--page-gutter);background:var(--surface)}
+.request-detail-view .request-detail-actions .role-actions button{flex:1 1 0;min-width:0;min-height:44px;height:44px;padding:0 12px;border-radius:12px;font-size:16px}
+/* 账单卡片可点击进入详情 */
+#role-bills .approval-card.is-clickable{cursor:pointer}
+#role-bills .approval-card.is-clickable:active{background:#f6f8f7}
+#role-bills .approval-card.is-clickable:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.bill-enterprise-tabs.is-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* 卡片内部统一 12px 节奏：标题 / 信息表 / 提示 / 按钮之间都由 gap 控制，子元素不再自带外边距 */
+.role-workflow .approval-card{display:grid;gap:12px}
+.role-workflow .approval-card>*{margin:0}
+.role-workflow .approval-card>.role-feedback{font-size:12px;line-height:20px}
+.role-workflow .approval-card>.role-feedback:empty{display:none}
+.role-workflow .approval-card>.role-actions.approval-card-actions{margin-top:0}
+/* 企业审批：三个状态Tab + 横向类型筛选芯片 + 物业审批样式（类型标签+单行标题） */
+.screen #role-approvals.enterprise-approvals{padding:0;gap:0}
+.screen #role-approvals.enterprise-approvals:not(.hidden){display:flex;flex-direction:column}
+#role-approvals.enterprise-approvals>.approval-tabs{flex:none;grid-template-columns:repeat(3,minmax(0,1fr))}
+#role-approvals.enterprise-approvals>.enterprise-type-filter{flex:none;display:flex;gap:8px;overflow-x:auto;padding:12px var(--page-gutter) 0;scrollbar-width:none}
+#role-approvals.enterprise-approvals>.enterprise-type-filter::-webkit-scrollbar{display:none}
+.enterprise-type-chip{flex:none;display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border:0;border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:13px;white-space:nowrap;cursor:pointer}
+.enterprise-type-chip.active{background:var(--soft);color:var(--brand);font-weight:600}
+.enterprise-type-chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#role-approvals.enterprise-approvals>.enterprise-approval-content{flex:1 0 auto;display:grid;align-content:start;gap:12px;padding:var(--page-gutter)}
+#role-approvals.enterprise-approvals .role-panel,#role-approvals.enterprise-approvals .role-empty{margin:0}
+#role-approvals.enterprise-approvals .card-type-chip{flex:none;margin-right:0;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--brand);font-size:12px;line-height:18px;font-weight:400}
+#role-approvals.enterprise-approvals .role-row{align-items:center;gap:8px}
+#role-approvals.enterprise-approvals .role-row>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#role-approvals.enterprise-approvals .role-row>.role-status{flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#role-approvals.enterprise-approvals .approval-card-actions button{height:32px;min-height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:1}
+#role-approvals.enterprise-approvals .approval-card.is-clickable{cursor:pointer}
+#role-approvals.enterprise-approvals .approval-card.is-clickable:active{background:#f6f8f7}
+#role-approvals.enterprise-approvals .approval-card.is-clickable:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* 企业账单：类型筛选与类型标签，样式同企业审批 / 物业收费 */
+#role-bills.bill-enterprise>.enterprise-type-filter{flex:none;display:flex;gap:8px;overflow-x:auto;padding:12px var(--page-gutter) 0;scrollbar-width:none}
+#role-bills.bill-enterprise>.enterprise-type-filter::-webkit-scrollbar{display:none}
+#role-bills.bill-enterprise .card-type-chip{flex:none;margin-right:0;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--brand);font-size:12px;line-height:18px;font-weight:400}
+#role-bills.bill-enterprise .role-row{align-items:center;gap:8px}
+#role-bills.bill-enterprise .role-row>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#role-bills.bill-enterprise .role-row>.role-status{flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#role-bills.bill-enterprise .approval-card-actions button{height:32px;min-height:32px;padding:0 12px;border-radius:8px;font-size:14px;line-height:1}
+/* 空状态统一：与物业工作台一致的虚线框 + 半透明白底（审批、账单、报修、申请等所有角色页面及服务流程） */
+.screen .role-workflow .role-empty.role-empty,.screen .role-workflow .role-panel.role-empty,.screen #role-approvals .role-empty,.screen #role-bills .role-empty,.screen .journey-empty.journey-empty{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:120px;margin:0;padding:0 16px;border:1px dashed #cfd8d3;border-radius:var(--r-md);background:rgba(255,255,255,.6);color:var(--muted);font-size:14px;line-height:20px;text-align:center}
+/* 空状态只在没有卡片时出现：带 hidden 的空状态必须保持隐藏（上一条 display:flex 不能覆盖它） */
+.screen .role-empty[hidden],.screen .journey-empty[hidden],.screen .center-empty[hidden]{display:none!important}
+/* 未认证访客：我的服务入口置灰，点击提示需企业认证 */
+#profile .mp-my-services.is-locked .mp-service-item.is-locked{opacity:.45;filter:grayscale(1);cursor:not-allowed}
+#profile .mp-my-services.is-locked .mp-service-item.is-locked:focus-visible{opacity:.7;outline:2px solid var(--brand);outline-offset:2px}
