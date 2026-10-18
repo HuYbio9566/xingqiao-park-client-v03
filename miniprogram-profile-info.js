@@ -118,14 +118,64 @@
     admin: { title: '企业身份', role: '企业管理员', phone: '138****6605', number: 'XQ-002', department: '行政部', position: '企业管理员' },
     property: { title: '工作身份', role: '物业人员', phone: '138****0018', number: 'WY-001', department: '物业服务部', position: '物业服务专员' }
   };
-  function openIdentity() {
+  // 企业身份: two tabs. 我的信息 is the default; 成员管理 is enterprise-admin only
+  // (moved out of 企业工作台 on 2026-10-18).
+  var identityTab = 'info';
+  function memberCount() {
+    var workflows = window.__roleWorkflows;
+    if (!workflows || !workflows.memberApplications) return 0;
+    return workflows.memberApplications().filter(function (r) { return r.status === 'pending'; }).length;
+  }
+  function ownsIdentity() { return !!identitySamples[profile.dataset.role] && identityPage.dataset.owner === profile.dataset.role; }
+  function identityTabs() {
+    var pending = memberCount();
+    var bar = el('div', undefined, 'identity-tabs');
+    bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', '企业身份');
+    [['info', '我的信息'], ['members', '成员管理']].forEach(function (pair) {
+      if (pair[0] === 'members' && profile.dataset.role !== 'admin') return;
+      var tab = el('button', pair[1], 'identity-tab'); tab.type = 'button';
+      tab.dataset.identityTab = pair[0];
+      tab.setAttribute('role', 'tab'); tab.id = 'identity-tab-' + pair[0];
+      tab.setAttribute('aria-controls', 'identity-panel-' + pair[0]);
+      tab.setAttribute('aria-selected', String(identityTab === pair[0]));
+      tab.onclick = function () { if (identityTab === pair[0]) return; identityTab = pair[0]; openIdentity(true); };
+      // Roving focus: Left/Right move between tabs and activate them, as in a standard tablist.
+      tab.onkeydown = function (event) {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        var order = [...bar.querySelectorAll('[role="tab"]')], next = order[(order.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : order.length - 1)) % order.length];
+        identityTab = next.dataset.identityTab; openIdentity(true);
+        var focusTarget = identityPage.querySelector('[data-identity-tab="' + identityTab + '"]'); if (focusTarget) focusTarget.focus({ preventScroll: true });
+      };
+      if (pair[0] === 'members' && pending) { tab.append(el('b', String(pending), 'identity-tab-badge')); }
+      bar.append(tab);
+    });
+    return bar;
+  }
+  function identityPanel(name) {
+    var panel = el('div', undefined, 'identity-panel'); panel.id = 'identity-panel-' + name;
+    panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', 'identity-tab-' + name);
+    return panel;
+  }
+  // keepTab: true when switching tabs in place; entering from 「我的」 always starts on 我的信息.
+  function openIdentity(keepTab) {
     var current = profile.dataset.role, info = identitySamples[current];
     if (!info) return;
+    if (!keepTab || current !== 'admin') identityTab = 'info';
     identityPage.replaceChildren(); identityPage.dataset.owner = current;
     window.__setMiniRoute(identityPage.id, info.title, 'profile');
-    var intro = el('div', undefined, 'profile-identity-intro');
-    intro.append(el('h2', info.title), paragraph('查看当前账号绑定的身份信息，以下信息仅供查阅。'));
-    identityPage.append(intro, group('基本信息', [
+    identityPage.append(identityTabs());
+    if (identityTab === 'members') {
+      // The tab already names the section; no extra heading or description.
+      var members = identityPanel('members'); members.classList.add('identity-members');
+      var list = el('div', undefined, 'identity-members-list'); members.append(list);
+      identityPage.append(members);
+      if (window.__roleWorkflows && window.__roleWorkflows.openMembers) window.__roleWorkflows.openMembers(list, function () { openIdentity(true); });
+      show(identityPage.id); return;
+    }
+    var infoPanel = identityPanel('info');
+    identityPage.append(infoPanel);
+    infoPanel.append(group('基本信息', [
       row('姓名', profile.querySelector('.mp-name').textContent), row('手机号', info.phone), row('当前身份', info.role)
     ]), group(current === 'property' ? '工作信息' : '企业绑定信息', [
       row(current === 'property' ? '所属单位' : '企业名称', profile.querySelector('.mp-company').textContent),
@@ -135,7 +185,7 @@
     ]));
     var note = el('div', undefined, 'profile-identity-notice');
     note.append(paragraph('身份信息不可在此编辑。如需修改，请联系管理人员在物业后台管理系统中更新。'), paragraph('为保护您的隐私，手机号已脱敏显示。'));
-    identityPage.append(note); show(identityPage.id);
+    infoPanel.append(note); show(identityPage.id);
   }
   var beforeBindingCan = window.__canMiniPage;
   window.__canMiniPage = function (id) {
@@ -153,7 +203,7 @@
   profile.addEventListener('click', function (event) {
     if (!event.target.closest('[data-profile-identity]') || (!bindingAllowed() && !identitySamples[profile.dataset.role])) return;
     event.preventDefault(); event.stopImmediatePropagation();
-    if (bindingAllowed()) openBinding(); else openIdentity();
+    if (bindingAllowed()) openBinding(); else { identityTab = 'info'; openIdentity(true); }
   }, true);
 
   // ---- 隐私与授权 ----

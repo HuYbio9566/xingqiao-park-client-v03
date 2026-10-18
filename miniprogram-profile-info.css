@@ -1,9 +1,17 @@
 /* 「我的」信息页：白色底、分组列表（左标签右值），与常规 App 设置页一致 */
 .screen .profile-info-page{min-height:100%;padding:0 0 32px;background:#fff}
 .screen .profile-info-page:not(.hidden){display:block}
-.screen .profile-identity-page{padding:16px 16px 32px;background:var(--bg)}
-.profile-identity-intro{margin-bottom:16px}
-.profile-identity-intro h2{margin:0 0 8px;font-size:16px;line-height:24px}
+.screen .profile-identity-page{padding:0 0 32px;background:var(--bg)}
+/* 企业身份 tabs: full-bleed bar, same as the 我的服务 list pages (.my-services-list .my-services-filters). */
+.identity-tabs{display:flex;gap:0;height:44px;margin:0;padding:0;background:#fff;border-bottom:var(--divider-width) solid var(--line)}
+.identity-tab{position:relative;flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px;height:44px;padding:0 12px;border:0;border-radius:0;background:#fff;color:var(--muted);font:inherit;font-size:14px;font-weight:400;cursor:pointer}
+.identity-tab[aria-selected=true]{background:#fff;color:var(--brand);font-weight:600}
+.identity-tab[aria-selected=true]:after{content:"";position:absolute;right:20%;bottom:0;left:20%;height:2px;border-radius:2px;background:var(--brand)}
+.identity-tab:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.identity-tab-badge{display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#c44d39;color:#fff;font-size:11px;font-weight:700;line-height:16px}
+.identity-panel{padding:var(--page-gutter,16px)}
+.identity-members-list{display:grid;gap:12px}
+.identity-members-list .role-panel{margin:0}
 .profile-identity-page .profile-info-group{margin-bottom:12px;padding:0 16px;border:0;border-radius:var(--r-md);background:var(--surface,#fff)}
 .profile-identity-page .profile-info-group-title{padding-bottom:8px}
 .profile-identity-notice{padding:4px 0}

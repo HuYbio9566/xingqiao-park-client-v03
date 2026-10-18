@@ -486,7 +486,6 @@
   var visitorsPage = page('role-visitors', '接待访客');
   var visitorForm = page('role-visitor-form', '登记来访', 'role-visitors');
   var enterpriseReservationsPage = page('role-enterprise-reservations', '企业预约');
-  var membersPage = page('role-members', '成员审核');
   var meetingApplications = page('role-meeting-applications', '场地预定');
   var denied = el('div', undefined, 'role-permission-modal hidden'); denied.id = 'role-denied';
   var permissionCard = el('div', undefined, 'role-permission-card');
@@ -543,7 +542,7 @@
     if (event.key === 'Escape') { event.preventDefault(); event.stopImmediatePropagation(); closePermission(); }
     else if (event.key === 'Tab') { event.preventDefault(); (document.activeElement === permissionReturn ? permissionClose : permissionReturn).focus(); }
   }, true);
-  var protectedPages = { 'role-requests': ['employee', 'admin'], 'role-request-form': ['employee', 'admin'], 'role-approvals': ['admin', 'property'], 'role-request-detail': ['employee', 'admin', 'property'], 'role-bills': ['admin', 'property'], 'role-bill-detail': ['admin', 'property'], 'role-members': ['admin'], 'role-repairs': ['employee', 'admin', 'property'], 'role-repair-form': ['employee', 'admin'], 'role-visitors': ['employee', 'admin'], 'role-visitor-form': ['employee', 'admin'], 'role-enterprise-reservations': ['admin'], meeting: ['employee', 'admin'], 'meeting-detail': ['employee', 'admin'], 'meeting-booking': ['employee', 'admin'], 'meeting-confirm': ['employee', 'admin'], 'meeting-success': ['employee', 'admin'], 'my-bookings': ['employee', 'admin'], 'booking-record-detail': ['employee', 'admin'], visitor: ['guest', 'employee', 'admin'], 'visitor-records': ['employee', 'admin'], repair: ['employee', 'admin'], 'repair-records': ['employee', 'admin'], 'property-service-chat': ['property'], 'property-service-notice': ['property'], 'property-service-notices': ['property'] };
+  var protectedPages = { 'role-requests': ['employee', 'admin'], 'role-request-form': ['employee', 'admin'], 'role-approvals': ['admin', 'property'], 'role-request-detail': ['employee', 'admin', 'property'], 'role-bills': ['admin', 'property'], 'role-bill-detail': ['admin', 'property'], 'role-repairs': ['employee', 'admin', 'property'], 'role-repair-form': ['employee', 'admin'], 'role-visitors': ['employee', 'admin'], 'role-visitor-form': ['employee', 'admin'], 'role-enterprise-reservations': ['admin'], meeting: ['employee', 'admin'], 'meeting-detail': ['employee', 'admin'], 'meeting-booking': ['employee', 'admin'], 'meeting-confirm': ['employee', 'admin'], 'meeting-success': ['employee', 'admin'], 'my-bookings': ['employee', 'admin'], 'booking-record-detail': ['employee', 'admin'], visitor: ['guest', 'employee', 'admin'], 'visitor-records': ['employee', 'admin'], repair: ['employee', 'admin'], 'repair-records': ['employee', 'admin'], 'property-service-chat': ['property'], 'property-service-notice': ['property'], 'property-service-notices': ['property'] };
   ['leasing-chat', 'consultant-li-chat', 'consultant-chen-chat', 'message-consultations', 'message-space-list', 'message-booking-list', 'message-notice-list', 'message-space', 'message-booking', 'message-booking-help', 'message-notice'].forEach(function (id) { protectedPages[id] = ['guest', 'employee', 'admin']; });
   document.querySelectorAll('section[id^="message-example-"]').forEach(function (node) { protectedPages[node.id] = ['guest', 'employee', 'admin']; });
   protectedPages['role-meeting-applications'] = ['employee', 'admin'];
@@ -706,7 +705,7 @@
       var first = selected[0].split(/[–—-]/), last = selected[selected.length - 1].split(/[–—-]/);
       var start = date.value + 'T' + first[0], end = date.value + 'T' + last[1];
       if (meetingTime(start) <= Date.now()) { status.textContent = '预约日期和时段须晚于当前时间。'; return; }
-      var record = { id: 'SQ' + Date.now().toString(36), owner: role(), company: company, type: 'meeting', room: roomName, detail: reason.value.trim(), amount: Number(amount.value), meetingStart: start.value, meetingEnd: end.value, status: 'enterprise', history: [identities[role()] + '提交场地预定申请（' + roomName + '）'] };
+      var record = { id: 'SQ' + Date.now().toString(36), owner: role(), company: company, type: 'meeting', room: roomName, detail: reason.value.trim(), amount: Number(amount.value), meetingStart: start, meetingEnd: end, status: 'enterprise', history: [identities[role()] + '提交场地预定申请（' + roomName + '）'] };
       if (!commit(function () { state.requests.unshift(record); })) { status.textContent = feedback.textContent || '保存失败，请重试。'; return; }
       hide(); toast('申请已提交，可在「我的 → 我的预约」中查看审批进度');
     };
@@ -769,7 +768,7 @@
     if (role() === 'admin') {
       propertyCard('审批', 'clipboard-check', pendingRequests().filter(function (r) { return !cardIsHidden('request', r.id); }).length + pendingVehicleRequests().filter(function (r) { return !cardIsHidden('vehicle', r.id); }).length + pendingDomainRequests('monitorRequests').filter(function (r) { return !cardIsHidden('monitor', r.id); }).length + pendingDomainRequests('releaseRequests').filter(function (r) { return !cardIsHidden('release', r.id); }).length, '项待审批', showApprovals, todoGrid);
       propertyCard('账单', 'receipt', enterpriseFees().filter(function (item) { return item.stage !== 'paid'; }).length, '笔待缴费', function () { showBills('unpaid'); }, todoGrid);
-      propertyCard('成员审核', 'user-check', memberApplications().filter(function (item) { return item.status === 'pending'; }).length, '项待审核', renderMembers, todoGrid);
+      // 成员管理 lives in 企业身份 as its own tab (miniprogram-profile-info.js).
     }
     if (role() === 'property' && window.__propertyWorkbench) {
       window.__propertyWorkbench.renderProfile();
@@ -1431,35 +1430,40 @@
     return rows.filter(function (r) { return r.company === company; });
   }
   function saveMembers(rows) { try { localStorage.setItem(memberKey, JSON.stringify(rows[0] || null)); } catch (error) { return false; } return true; }
-  function renderMembers() {
-    if (role() !== 'admin') return open('role-denied');
+  // Single decision path shared by the 企业身份 → 成员管理 tab and the legacy renderMembers view.
+  function reviewMember(record, status, reason) {
+    if (role() !== 'admin' || !record || record.status !== 'pending') return false;
+    var before = JSON.stringify(record);
+    Object.assign(record, status === 'approved'
+      ? { status: 'approved', reviewedBy: identities[role()], reviewedAt: new Date().toISOString(), reviewNote: '' }
+      : { status: 'rejected', reviewedBy: identities[role()], reviewedAt: new Date().toISOString(), reviewNote: String(reason || '').trim() });
+    if (!saveMembers([record])) { Object.assign(record, JSON.parse(before)); return false; }
+    renderProfile(); return true;
+  }
+  // 成员管理 list, mounted inside 企业身份 → 成员管理 (miniprogram-profile-info.js).
+  function renderMembers(container, onChange) {
+    if (role() !== 'admin' || !container) return false;
+    container.replaceChildren();
     var rows = memberApplications();
-    heading(membersPage, '成员审核', '审核员工提交的企业绑定申请；通过后员工即可使用企业员工服务。');
-    if (!rows.length) return empty(membersPage, '暂无待审核的成员申请。');
+    if (!rows.length) { empty(container, '暂无成员绑定申请。'); return true; }
     rows.forEach(function (r) {
       var card = panel(r.name + ' · ' + r.company, r.status === 'pending' ? '待审核' : r.status === 'approved' ? '已通过' : '已驳回', r.employeeId + (r.department ? ' · ' + r.department : ''));
-      infoGrid(card, [['姓名', r.name], ['手机号', r.phone], ['员工工号', r.employeeId], ['所属部门', r.department], ['提交时间', r.submittedAt ? String(r.submittedAt).replace('T', ' ').slice(0, 16) : '']]);
+      infoGrid(card, [['姓名', r.name], ['手机号', r.phone], ['员工工号', r.employeeId], ['所属部门', r.department], ['提交时间', r.submittedAt ? String(r.submittedAt).replace('T', ' ').slice(0, 16) : ''], ['驳回原因', r.status === 'rejected' ? r.reviewNote : '']]);
       if (r.status === 'pending') {
         var note = el('p', '', 'role-feedback'); note.setAttribute('role', 'status'); card.append(note);
-        var bar = actions(card);
-        bar.append(action('驳回', function () {
+        var done = function (ok) { if (!ok) { note.textContent = '保存失败，请检查浏览器存储设置。'; return; } renderMembers(container, onChange); if (onChange) onChange(); };
+        actions(card).append(action('驳回', function () {
           var reason = window.prompt ? window.prompt('填写驳回原因', '工号与企业登记信息不一致') : '';
           if (reason === null) return;
           if (!String(reason).trim()) { note.textContent = '请填写驳回原因。'; return; }
-          Object.assign(r, { status: 'rejected', reviewNote: String(reason).trim(), reviewedBy: identities[role()], reviewedAt: new Date().toISOString() });
-          if (!saveMembers([r])) { note.textContent = '保存失败，请检查浏览器存储设置。'; return; }
-          renderMembers(); renderProfile();
-        }), action('通过', function () {
-          Object.assign(r, { status: 'approved', reviewedBy: identities[role()], reviewedAt: new Date().toISOString() });
-          if (!saveMembers([r])) { note.textContent = '保存失败，请检查浏览器存储设置。'; return; }
-          renderMembers(); renderProfile();
-        }, true));
+          done(reviewMember(r, 'rejected', reason));
+        }), action('通过', function () { done(reviewMember(r, 'approved')); }, true));
       }
-      membersPage.append(card);
+      container.append(card);
     });
-    open('role-members');
+    return true;
   }
-  window.__roleWorkflows = { refresh: renderProfile, openMembers: renderMembers, isCurrent: function () { try { return localStorage.getItem(key) === persistedState; } catch (error) { return false; } }, canBook: canBook, bookingApproval: bookingApproval, validateBooking: validateBooking, openMeetingEntry: openMeetingEntry, canManageBooking: function (item) { return enterprise() && (item.sample === true || item.owner === role() && item.company === company); }, openRequests: showRequests, openApprovals: showApprovals, openBills: showBills, openRepairs: showRepairs,
+  window.__roleWorkflows = { refresh: renderProfile, openMembers: renderMembers, memberApplications: memberApplications, reviewMember: reviewMember, isCurrent: function () { try { return localStorage.getItem(key) === persistedState; } catch (error) { return false; } }, canBook: canBook, bookingApproval: bookingApproval, validateBooking: validateBooking, openMeetingEntry: openMeetingEntry, canManageBooking: function (item) { return enterprise() && (item.sample === true || item.owner === role() && item.company === company); }, openRequests: showRequests, openApprovals: showApprovals, openBills: showBills, openRepairs: showRepairs,
     completeFeeRequest: completeFeeRequest,
     propertyData: function () { return state; }, propertyCommit: function (change) { return role() === 'property' && commit(change); }, releaseCommit: function (change) { return enterprise() && commit(change); }, enterpriseCommit: function (change) { return enterprise() && commit(change); }, propertyIdentity: function () { return identities.property; },
     myRecords: function () { return { requests: ownRequests(), repairs: repairs(), visitors: state.visitors.filter(function (v) { return v.owner === role() && v.company === company; }), vehicleRequests: visibleDomainRecords('vehicleRequests'), monitorRequests: visibleDomainRecords('monitorRequests'), specialTickets: visibleDomainRecords('specialTickets'), activityRegistrations: visibleDomainRecords('activityRegistrations'), releaseRequests: accessibleReleaseRequests() }; },
