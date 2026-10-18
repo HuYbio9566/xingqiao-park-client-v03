@@ -69,6 +69,9 @@
 .phone .visit-date-panel :is(button,[role=spinbutton]):focus-visible{outline:2px solid var(--visit-green);outline-offset:-2px;border-radius:8px}
 .phone .visit-date-summary{margin:14px 0 8px;font-size:14px;font-weight:600;color:var(--text);text-align:center;font-variant-numeric:tabular-nums}
 .phone .visit-date-help,.phone .visit-date-hint{margin:4px 0 0;line-height:1.6;color:var(--muted);font-size:12px;text-align:center}
+/* Gesture help stays for screen readers only; the visible sheet shows a single-line hint. */
+.phone .visit-date-help.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.phone .visit-date-hint{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #visitor .visit-date-trigger[aria-invalid=true]{border-color:#96530d}
 .phone .visit-date-sheet.is-closing .visit-date-mask{animation:visit-mask-out .18s ease-in both}
 .phone .visit-date-sheet.is-closing .visit-date-panel{animation:visit-sheet-out .18s ease-in both}

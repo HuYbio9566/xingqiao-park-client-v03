@@ -40,16 +40,16 @@
     var info=page.querySelector('#visit-info'),verify=page.querySelector('#visit-verify'),result=page.querySelector('#visit-result');
     var status=page.querySelector('#visit-status'),code=page.querySelector('#visit-code'),resend=page.querySelector('#visit-resend');
     // Page navigation hides every section; the dialog must not be a route section.
-    var dateSheet=document.createElement('div');dateSheet.className='visit-date-sheet hidden';dateSheet.innerHTML='<div class="visit-date-mask"></div><div class="visit-date-panel" role="dialog" aria-modal="true" aria-labelledby="visit-date-title" aria-describedby="visit-date-help"><div class="visit-date-grabber" aria-hidden="true"></div><header><button type="button" class="visit-date-cancel">取消</button><h2 id="visit-date-title">选择时间</h2><button type="button" class="visit-date-done">确定</button></header><div class="visit-wheel-year"><button type="button" class="visit-year-prev" aria-label="上一年">‹</button><b></b><button type="button" class="visit-year-next" aria-label="下一年">›</button></div><div class="visit-wheel-labels" aria-hidden="true"><span>日期</span><span>时</span><span>分</span></div><div class="visit-date-wheels"></div><p class="visit-date-summary" role="status"></p><p id="visit-date-help" class="visit-date-help">上下滑动或点选，方向键可调整。</p><p class="visit-date-hint" role="status"></p></div>';
+    var dateSheet=document.createElement('div');dateSheet.className='visit-date-sheet hidden';dateSheet.innerHTML='<div class="visit-date-mask"></div><div class="visit-date-panel" role="dialog" aria-modal="true" aria-labelledby="visit-date-title" aria-describedby="visit-date-help"><div class="visit-date-grabber" aria-hidden="true"></div><header><button type="button" class="visit-date-cancel">取消</button><h2 id="visit-date-title">选择时间</h2><button type="button" class="visit-date-done">确定</button></header><div class="visit-wheel-year"><button type="button" class="visit-year-prev" aria-label="上一年">‹</button><b></b><button type="button" class="visit-year-next" aria-label="下一年">›</button></div><div class="visit-wheel-labels" aria-hidden="true"><span>日期</span><span>时</span><span>分</span></div><div class="visit-date-wheels"></div><p class="visit-date-summary" role="status"></p><p id="visit-date-help" class="visit-date-help visually-hidden">上下滑动或点选，方向键可调整。</p><p class="visit-date-hint" role="status"></p></div>';
     document.querySelector('.phone').appendChild(dateSheet);
     var datePanel=dateSheet.querySelector('.visit-date-panel'),wheels=dateSheet.querySelector('.visit-date-wheels'),dateSheetTarget=null,dateSheetPrevious=null,dragStart=null,closeTimer=null;
-    var pickedDay='',pickedHour=0,pickedMinute=0,wheelYear=0,lower='',columns={};
+    var pickedDay='',pickedHour=0,pickedMinute=0,wheelYear=0,lower='',columns={},external=null;
     function pad(n){return String(n).padStart(2,'0')}
     function localValue(date){return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+'T'+pad(date.getHours())+':'+pad(date.getMinutes())}
     function dayLabel(value){var parts=value.split('-'),date=new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));return Number(parts[1])+'月'+Number(parts[2])+'日 周'+'日一二三四五六'[date.getDay()]}
     function formatDateValue(value){return value.slice(0,4)+'年'+dayLabel(value.slice(0,10))+' '+value.slice(11,16)}
     function syncTrigger(name){var input=field(name),trigger=page.querySelector('#visit-'+name+'-trigger'),title=name==='start'?'预计到访时间':'预计离园时间';trigger.querySelector('span').textContent=input.value?formatDateValue(input.value):'请选择'+(name==='start'?'到访':'离园')+'日期和时间';trigger.setAttribute('aria-label',title+'，必填'+(input.value?'，'+formatDateValue(input.value):''))}
-    function minimumValue(){var floor=Math.floor(Date.now()/60000)*60000+60000;if(dateSheetTarget===field('end'))floor=Math.max(floor,new Date(field('start').value).getTime()+60000);return localValue(new Date(floor))}
+    function minimumValue(){var floor=Math.floor(Date.now()/60000)*60000+60000;if(external){var extra=external.min&&external.min();if(extra)floor=Math.max(floor,new Date(extra).getTime()+60000);return localValue(new Date(floor))}if(dateSheetTarget===field('end'))floor=Math.max(floor,new Date(field('start').value).getTime()+60000);return localValue(new Date(floor))}
     function numbers(min,max){var list=[];for(var n=min;n<=max;n++)list.push(n);return list}
     function summary(){dateSheet.querySelector('.visit-date-summary').textContent='已选：'+formatDateValue(pickedDay+'T'+pad(pickedHour)+':'+pad(pickedMinute))}
     // Fixed-height scroll-snap rows keep touch, mouse and keyboard on the same draft value.
@@ -71,20 +71,32 @@
       dateSheet.querySelector('.visit-wheel-year b').textContent=wheelYear+'年';dateSheet.querySelector('.visit-year-prev').disabled=wheelYear<=Number(lower.slice(0,4));dateSheet.querySelector('.visit-year-next').disabled=wheelYear>=9999;
       column('date','日期',days,pickedDay,dayLabel,function(value){pickedDay=value;renderHours()});renderHours();
     }
-    function closeDateSheet(returnFocus){if(closeTimer)window.clearTimeout(closeTimer);dateSheet.classList.add('is-closing');if(dateSheetPrevious)dateSheetPrevious.setAttribute('aria-expanded','false');if(returnFocus&&dateSheetPrevious)dateSheetPrevious.focus({preventScroll:true});closeTimer=window.setTimeout(function(){dateSheet.classList.add('hidden');dateSheet.classList.remove('is-closing');dateSheetTarget=null;closeTimer=null},180)}
+    function closeDateSheet(returnFocus){if(closeTimer)window.clearTimeout(closeTimer);dateSheet.classList.add('is-closing');if(dateSheetPrevious)dateSheetPrevious.setAttribute('aria-expanded','false');if(returnFocus&&dateSheetPrevious)dateSheetPrevious.focus({preventScroll:true});closeTimer=window.setTimeout(function(){dateSheet.classList.add('hidden');dateSheet.classList.remove('is-closing');dateSheetTarget=null;external=null;closeTimer=null},180)}
     function openDateSheet(target,trigger){
+      external=null;
       if(target===field('end')&&!field('start').value){tell('请先选择到访日期和时间。',page.querySelector('#visit-start-trigger'));return}
       if(closeTimer)window.clearTimeout(closeTimer);closeTimer=null;if(dateSheetPrevious)dateSheetPrevious.setAttribute('aria-expanded','false');dateSheetTarget=target;dateSheetPrevious=trigger;lower=minimumValue();var value=target.value&&target.value>=lower?target.value:lower;
+      showSheet(value,trigger.id==='visit-start-trigger'?'预计到访时间':'预计离园时间',target===field('end')?'离园须晚于到访时间':'请选择未来时间',trigger);
+    }
+    function showSheet(value,title,hint,trigger){
       pickedDay=value.slice(0,10);pickedHour=Number(value.slice(11,13));pickedMinute=Number(value.slice(14,16));wheelYear=Number(value.slice(0,4));
-      dateSheet.querySelector('#visit-date-title').textContent=trigger.id==='visit-start-trigger'?'预计到访时间':'预计离园时间';dateSheet.querySelector('.visit-date-hint').textContent=target===field('end')?'离园时间须晚于到访时间。':'请选择未来的到访时间。';dateSheet.classList.remove('hidden','is-closing');wheels.replaceChildren();columns={};renderDates();trigger.setAttribute('aria-expanded','true');dateSheet.querySelector('.visit-date-cancel').focus({preventScroll:true});
+      dateSheet.querySelector('#visit-date-title').textContent=title;dateSheet.querySelector('.visit-date-hint').textContent=hint;dateSheet.classList.remove('hidden','is-closing');wheels.replaceChildren();columns={};renderDates();trigger.setAttribute('aria-expanded','true');dateSheet.querySelector('.visit-date-cancel').focus({preventScroll:true});
+    }
+    // Same three-column wheel for other forms (e.g. 企业员工「登记来访」). The caller owns its input and validation.
+    function openWheel(options){
+      if(closeTimer)window.clearTimeout(closeTimer);closeTimer=null;if(dateSheetPrevious)dateSheetPrevious.setAttribute('aria-expanded','false');
+      external=options;dateSheetTarget=options.input;dateSheetPrevious=options.trigger;lower=minimumValue();var current=options.input.value;
+      showSheet(current&&current>=lower?current:lower,options.title,options.hint||'请选择未来时间',options.trigger);
     }
     function finishDateSheet(){
       if(!dateSheetTarget||dateSheet.classList.contains('is-closing'))return;['date','hour','minute'].forEach(function(name){columns[name].dispatchEvent(new Event('scroll'))});var next=pickedDay+'T'+pad(pickedHour)+':'+pad(pickedMinute);
-      if(next<minimumValue()){dateSheet.querySelector('.visit-date-hint').textContent=dateSheetTarget===field('end')?'离园时间必须晚于到访时间，且不能早于当前时间。':'所选到访时间已过，请重新选择。';return}
+      if(next<minimumValue()){dateSheet.querySelector('.visit-date-hint').textContent=external?(external.lateHint||'所选时间已过，请重选'):dateSheetTarget===field('end')?'离园须晚于到访时间，请重选':'所选时间已过，请重选';return}
+      if(external){var input=external.input,done=external.onDone;input.value=next;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));closeDateSheet(true);if(done)done(next);return}
       var name=dateSheetTarget.name;dateSheetTarget.value=next;dateSheetTarget.dispatchEvent(new Event('change',{bubbles:true}));syncTrigger(name);dateSheetPrevious.removeAttribute('aria-invalid');
       if(name==='start'&&field('end').value&&field('end').value<=next){field('end').value='';syncTrigger('end');page.querySelector('#visit-end-trigger').setAttribute('aria-invalid','true');tell('到访时间已更新，原离园时间已失效，请重新选择离园时间。')}else tell('');
       closeDateSheet(true);
     }
+    window.__visitWheel={open:openWheel,isOpen:function(){return !dateSheet.classList.contains('hidden')&&!dateSheet.classList.contains('is-closing')}};
     page.querySelectorAll('.visit-date-trigger').forEach(function(trigger){trigger.onclick=function(){openDateSheet(page.querySelector('#'+trigger.id.replace('-trigger','')),trigger)}});
     dateSheet.querySelector('.visit-date-done').onclick=finishDateSheet;dateSheet.querySelector('.visit-date-cancel').onclick=function(){closeDateSheet(true)};dateSheet.querySelector('.visit-date-mask').onclick=function(){closeDateSheet(true)};
     dateSheet.querySelector('.visit-year-prev').onclick=function(){wheelYear--;renderDates()};dateSheet.querySelector('.visit-year-next').onclick=function(){wheelYear++;renderDates()};

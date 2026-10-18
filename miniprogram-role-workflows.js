@@ -1380,10 +1380,30 @@
     // Back returns to wherever the form was opened from (home entry, visitor list, etc.), same as 提交报修.
     var opener = screen.querySelector('section:not(.hidden)'), visitorReturn = opener && opener.id !== 'role-visitor-form' ? opener.id : 'role-visitors';
     window.__setMiniRoute('role-visitor-form', '登记来访', visitorReturn); visitorForm.replaceChildren();
+    var status = el('p', '', 'role-feedback');
     var form = el('form', undefined, 'role-panel'), requester = role(), name = field(form, '访客姓名', 'text', 'name'), phone = field(form, '访客手机', 'tel', 'phone'), location = field(form, '接待地点', 'text', 'location'), start = field(form, '到访时间', 'datetime-local', 'start'), end = field(form, '离园时间', 'datetime-local', 'end'), purpose = field(form, '来访事由', 'textarea', 'purpose');
-    if (window.__miniDatePicker) { window.__miniDatePicker.enhance(start, {mode:'datetime',title:'到访时间'}); window.__miniDatePicker.enhance(end, {mode:'datetime',title:'离园时间'}); }
+    // Same 日期 / 时 / 分 wheel as 访客预约 (window.__visitWheel); fall back to the calendar picker if it is unavailable.
+    if (window.__visitWheel) { wheelField(start, '到访时间', function () { return ''; }, '请选择未来时间'); wheelField(end, '离园时间', function () { return start.value; }, '离园须晚于到访时间', function () { return start.value ? '' : '请先选择到访时间。'; }); }
+    else if (window.__miniDatePicker) { window.__miniDatePicker.enhance(start, {mode:'datetime',title:'到访时间'}); window.__miniDatePicker.enhance(end, {mode:'datetime',title:'离园时间'}); }
+    function wheelField(input, title, min, hint, blocked) {
+      input.type = 'text'; input.readOnly = true; input.tabIndex = -1; input.setAttribute('aria-hidden', 'true'); input.classList.add('mini-date-native');
+      var trigger = el('button', undefined, 'quick-date-trigger mini-date-trigger'); trigger.type = 'button';
+      trigger.setAttribute('aria-haspopup', 'dialog'); trigger.setAttribute('aria-expanded', 'false');
+      var text = el('span'), icon = el('i'); icon.dataset.lucide = 'calendar-clock'; icon.setAttribute('aria-hidden', 'true'); trigger.append(text, icon); input.after(trigger);
+      var label = function (value) { if (!value) return '请选择' + title; var d = value.slice(0, 10).split('-'); return d[0] + '年' + Number(d[1]) + '月' + Number(d[2]) + '日 ' + value.slice(11, 16); };
+      var sync = function () { text.textContent = label(input.value); text.classList.toggle('is-placeholder', !input.value); trigger.setAttribute('aria-label', title + '，必填' + (input.value ? '，' + label(input.value) : '')); };
+      sync(); input.addEventListener('change', sync);
+      trigger.onclick = function () {
+        var reason = blocked && blocked(); if (reason) { status.textContent = reason; return; }
+        status.textContent = '';
+        window.__visitWheel.open({ input: input, trigger: trigger, title: title, hint: hint, min: min, lateHint: input === end ? '离园须晚于到访时间，请重选' : '所选时间已过，请重选', onDone: function (value) {
+          // A new arrival time invalidates an earlier departure, as on 访客预约.
+          if (input === start && end.value && end.value <= value) { end.value = ''; end.dispatchEvent(new Event('change')); status.textContent = '到访时间已更新，请重新选择离园时间。'; }
+        } });
+      };
+    }
     phone.pattern = '1[3-9][0-9]{9}'; phone.maxLength = 11;
-    var status = el('p', '', 'role-feedback'); status.setAttribute('role', 'status'); form.append(status); form.id = 'role-visitor-form-fields'; var submitBar = el('div', undefined, 'role-actions journey-actions journey-block-actions'), submit = el('button', '保存来访安排', 'role-primary'); submit.type = 'submit'; submit.setAttribute('form', form.id); submitBar.append(submit);
+    status.setAttribute('role', 'status'); form.append(status); form.id = 'role-visitor-form-fields'; var submitBar = el('div', undefined, 'role-actions journey-actions journey-block-actions'), submit = el('button', '保存来访安排', 'role-primary'); submit.type = 'submit'; submit.setAttribute('form', form.id); submitBar.append(submit);
     form.onsubmit = function (event) { event.preventDefault(); if (!enterprise() || role() !== requester) return open('role-denied'); if (!form.reportValidity()) return; if (![name, phone, location, start, end, purpose].every(function (i) { return i.value.trim(); })) { status.textContent = '请填写完整来访信息。'; return; } if (end.value <= start.value) { status.textContent = '离园时间须晚于到访时间。'; return; } if (commit(function () { state.visitors.unshift({ id: 'VK' + Date.now().toString(36), owner: role(), company: company, name: name.value.trim(), detail: location.value.trim() + ' · ' + start.value.replace('T', ' ') + ' 至 ' + end.value.replace('T', ' ') + ' · ' + purpose.value.trim(), phone: phone.value.trim(), cancelled: false }); })) { if (['home', 'park-services-all'].includes(visitorReturn)) { toast('来访安排已保存，可在「我的 → 我的预约」中查看'); open(visitorReturn); } else showVisitors(); } else status.textContent = feedback.textContent; };
     visitorForm.append(form, submitBar); open('role-visitor-form');
   }
