@@ -164,7 +164,7 @@
     if (!keepTab || current !== 'admin') identityTab = 'info';
     identityPage.replaceChildren(); identityPage.dataset.owner = current;
     window.__setMiniRoute(identityPage.id, info.title, 'profile');
-    identityPage.append(identityTabs());
+    if (current === 'admin') identityPage.append(identityTabs());
     if (identityTab === 'members') {
       // The tab already names the section; no extra heading or description.
       var members = identityPanel('members'); members.classList.add('identity-members');
