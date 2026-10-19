@@ -856,54 +856,36 @@
     else heading(node, existing ? '补充物品放行材料' : '申请物品放行', '计划时间为北京时间，请与门岗核对放行时段。' + (existing ? '补充后仍使用原放行编号。' : ''));
     var form = el('form', undefined, formReturn ? 'property-release-form role-panel' : 'property-release-form');
     var applicant = field(form, '申请人', 'applicantName', 'text', true), items = field(form, '物品与数量', 'items', 'textarea', true);
-    var location = field(form, '放行地点', 'location', 'text', true), date = field(form, '计划日期（北京时间） *', 'plannedDate', 'date', true);
-    if (window.__miniDatePicker) window.__miniDatePicker.enhance(date, {mode:'date',title:'计划日期'});
-    var timeRange = el('div', undefined, 'journey-time-range'); form.append(timeRange);
-    var start = window.__miniTimeField(timeRange, '开始时间', 'plannedStart', false), end = window.__miniTimeField(timeRange, '结束时间', 'plannedEnd', true);
-    start.required = true; end.required = true;
-    var legacyTime = el('input'); legacyTime.type = 'hidden'; legacyTime.name = 'plannedAt';
-    var legacyEnd = el('input'); legacyEnd.type = 'hidden'; legacyEnd.name = 'plannedEndAt';
-    form.append(legacyTime, legacyEnd);
+    var location = field(form, '放行地点', 'location', 'text', true);
+    var start = field(form, '开始时间（北京时间） *', 'plannedAt', 'text', true), end = field(form, '结束时间（北京时间） *', 'plannedEndAt', 'text', true);
     var comment = field(form, '说明 / 补件材料说明', 'note', 'textarea', !!existing);
-    function plannedParts(value) {
-      var match = String(value || '').match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
-      return match ? {date: match[1], time: match[2]} : {date: '', time: ''};
-    }
-    function addHour(value) {
-      var parts = String(value || '').split(':'), hour = Number(parts[0]), minute = Number(parts[1]);
-      if (!Number.isFinite(hour) || !Number.isFinite(minute)) return '';
-      return String((hour + 1) % 24).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
-    }
-    function syncLegacy() {
-      legacyTime.value = date.value && start.value ? date.value + 'T' + start.value : '';
-      legacyEnd.value = date.value && end.value ? date.value + 'T' + end.value : '';
-    }
-    date.addEventListener('change', syncLegacy); start.addEventListener('change', syncLegacy); end.addEventListener('change', syncLegacy);
     if (existing) {
-      var startParts = plannedParts(existing.plannedAt), endParts = plannedParts(existing.plannedEndAt);
-      applicant.value = existing.applicantName || ''; items.value = existing.items || ''; location.value = existing.location || '';
-      date.value = startParts.date; start.value = startParts.time; end.value = endParts.time || addHour(startParts.time); comment.value = existing.note || '';
-      legacyTime.value = existing.plannedAt || ''; legacyEnd.value = existing.plannedEndAt || '';
-      date.dispatchEvent(new Event('change', {bubbles:true})); start.dispatchEvent(new Event('change', {bubbles:true})); end.dispatchEvent(new Event('change', {bubbles:true}));
+      applicant.value = existing.applicantName || ''; items.value = existing.items || ''; location.value = existing.location || ''; comment.value = existing.note || '';
+      start.value = existing.plannedAt || '';
+      // Older records may lack an end time; default to one hour after the start.
+      var fallbackEnd = '';
+      if (start.value && !existing.plannedEndAt) { var t = new Date(start.value); if (Number.isFinite(t.getTime())) { t.setHours(t.getHours() + 1); fallbackEnd = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0') + 'T' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); } }
+      end.value = existing.plannedEndAt || fallbackEnd;
     }
     // Submit sits below the card as a full-width block; the form attribute keeps native submit/validation.
     form.id = 'property-release-form-fields';
     var message = feedback(form), valid = guard(node, existing, releases), submit = button('提交申请', null, true); submit.type = 'submit'; submit.setAttribute('form', form.id);
     var submitBar = el('div', undefined, 'role-actions journey-actions journey-block-actions'); submitBar.append(submit); body.append(form, submitBar);
+    // Same 日期 / 时 / 分 wheel as 访客预约.
+    if (window.__visitWheel && window.__visitWheel.range) {
+      window.__visitWheel.range(start, end, { status: message, startHint: '请选择未来时间' });
+      if (window.lucide) window.lucide.createIcons();
+    }
     form.onsubmit = function (event) { event.preventDefault();
       if (!valid()) { message.textContent = '身份、页面或记录状态已变化，请重新打开后操作。'; return; }
-      var dateValue = date.value, startValue = start.value, endValue = end.value;
-      if ((!dateValue || !startValue || !endValue) && legacyTime.value) {
-        var legacyStart = plannedParts(legacyTime.value), legacyFinish = plannedParts(legacyEnd.value);
-        dateValue = dateValue || legacyStart.date; startValue = startValue || legacyStart.time; endValue = endValue || legacyFinish.time || addHour(startValue);
-      }
-      if (![applicant, items, location].every(function (input) { return input.value.trim(); }) || !dateValue || !startValue || !endValue || existing && !comment.value.trim()) { message.textContent = '请填写申请人、物品、地点、计划日期、开始/结束时间及必要的补件说明。'; return; }
+      var startValue = start.value, endValue = end.value;
+      if (![applicant, items, location].every(function (input) { return input.value.trim(); }) || !startValue || !endValue || existing && !comment.value.trim()) { message.textContent = '请填写申请人、物品、地点、开始/结束时间及必要的补件说明。'; return; }
       if (endValue <= startValue) { message.textContent = '结束时间须晚于开始时间。'; return; }
-      if (!form.reportValidity() || !Number.isFinite(Date.parse(dateValue + 'T' + startValue + ':00+08:00'))) return;
+      if (!form.reportValidity() || !Number.isFinite(Date.parse(startValue + ':00+08:00'))) return;
       var nextId = existing ? existing.id : 'FX-' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
       if (save(valid, function () { return enterprise() && (!existing || own(existing) && existing.status === 'supplement'); }, function () {
         var item = existing || { id: nextId, owner: role(), company: company, createdAt: new Date().toISOString(), inspectionStatus: 'pending', history: [] };
-        Object.assign(item, { applicantName: applicant.value.trim(), items: items.value.trim(), location: location.value.trim(), plannedAt: dateValue + 'T' + startValue, plannedEndAt: dateValue + 'T' + endValue, note: comment.value.trim() });
+        Object.assign(item, { applicantName: applicant.value.trim(), items: items.value.trim(), location: location.value.trim(), plannedAt: startValue, plannedEndAt: endValue, note: comment.value.trim() });
         // Employees start at the enterprise stage; a supplement goes back to whoever asked for it.
         var backToEnterprise = existing ? existing.enterpriseStatus === 'supplement' : role() === 'employee';
         item.status = backToEnterprise ? 'enterprise_pending' : 'pending';

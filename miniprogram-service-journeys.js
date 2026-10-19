@@ -602,17 +602,20 @@
     heading(monitorPage, '监控调取', employee() ? '提交后由企业管理员审批，再由物业审核；批准后按园区规则线下对接调取。' : '提交后由物业审核；批准后按园区规则线下对接调取。');
     if (enterprise()) {
       var form = formPanel(monitorPage, '提交监控调取申请', '请填写时间、区域和用途，最终是否可提供以园区规则和线下核验为准。');
-      var date = field(form, '发生日期', 'date', 'date', true);
-      if (window.__miniDatePicker) window.__miniDatePicker.enhance(date, {mode:'date',title:'发生日期',min:''});
-      var range = el('div', undefined, 'journey-time-range');
-      form.appendChild(range);
-      var start = timeField(range, '开始时间', 'startTime', false);
-      var end = timeField(range, '结束时间', 'endTime', true);
+      var start = field(form, '开始时间', 'startTime', 'text', true);
+      var end = field(form, '结束时间', 'endTime', 'text', true);
       var area = field(form, '区域', 'area', 'text', true), reason = field(form, '申请用途', 'reason', 'textarea', true), note = status(form);
+      // Same 日期 / 时 / 分 wheel as 访客预约; monitoring looks back, so past times are allowed.
+      if (window.__visitWheel && window.__visitWheel.range) {
+        window.__visitWheel.range(start, end, { status: note, allowPast: true, startHint: '请选择监控开始时间' });
+        if (window.lucide) window.lucide.createIcons();
+      }
       blockActions(monitorPage).appendChild(button('提交申请', function () {
-        if (![date, start, end, area, reason].every(function (input) { return input.value.trim(); })) { note.textContent = '请完整填写发生日期、时间段、区域和用途。'; return; }
+        if (![start, end, area, reason].every(function (input) { return input.value.trim(); })) { note.textContent = '请完整填写开始时间、结束时间、区域和用途。'; return; }
         if (end.value <= start.value) { note.textContent = '结束时间须晚于开始时间。'; return; }
-        var requestedAt = date.value + ' ' + start.value + '–' + end.value;
+        var now = new Date(), nowValue = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + 'T' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        if (end.value > nowValue) { note.textContent = '监控时间不能晚于当前时间。'; return; }
+        var requestedAt = start.value.replace('T', ' ') + '–' + (end.value.slice(0, 10) === start.value.slice(0, 10) ? end.value.slice(11) : end.value.replace('T', ' '));
         var api = workflows && workflows.createMonitorRequest;
         if (api) {
           var created = api({ requestedAt: requestedAt, scope: area.value.trim(), purpose: reason.value.trim() });
