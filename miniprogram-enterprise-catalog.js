@@ -34,8 +34,9 @@
       });
       services.forEach(function (service) {
         var button = document.createElement(service.url ? 'a' : 'button');
-        if (service.url) {
-          button.href = service.url;
+        var safeUrl = service.url && /^(https?:\/\/|\/|\.\/|\.\.\/|miniprogram\/)/i.test(String(service.url)) && !/^(?:javascript|data|vbscript):/i.test(String(service.url)) ? String(service.url) : '';
+        if (safeUrl) {
+          button.href = safeUrl;
           button.target = '_blank';
           button.rel = 'noopener noreferrer';
         } else {

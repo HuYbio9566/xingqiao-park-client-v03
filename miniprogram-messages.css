@@ -51,6 +51,7 @@
 .message-category-page .category-context{font-size:12px;line-height:18px;color:var(--muted);overflow-wrap:anywhere}
 .message-category-page .category-preview{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:22px;color:var(--muted);overflow-wrap:anywhere}
 .message-category-page .category-kind,.message-category-page .category-link{display:inline-flex;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--brand)}
+.message-category-page .category-type{margin-left:8px;padding:2px 6px;border-radius:var(--r-sm);background:var(--soft);color:var(--brand);font-size:11px;line-height:16px;white-space:nowrap}
 .message-category-page .category-link{margin-left:auto}
 .message-category-page svg{flex-shrink:0;width:16px;height:16px;stroke-width:1.8}
 .message-category-page .category-unread{align-self:flex-start;width:8px;height:8px;border-radius:50%;background:#b34d37}

@@ -62,7 +62,7 @@
   function bookingRecords() { return store.data.bookings.filter(function (record) { return record.owner === role() && record.company === '北京星桥科技'; }); }
   function guard(handler, kind) { return function () { if (canKind(kind || context)) handler(); else window.__showMiniPage('role-denied'); }; }
   // Card 删除 hides the record from 我的服务 lists on this device; source records are untouched.
-  var hiddenKey = 'my-services-hidden-v1', hiddenRows = [];
+  var hiddenKey = 'v4:my-services-hidden-v1', hiddenRows = [];
   try { hiddenRows = JSON.parse(localStorage.getItem(hiddenKey) || '[]'); } catch (error) {}
   function isHidden(type, record) { return !!record && hiddenRows.includes(type + ':' + record.id); }
   function deleteButton(type, title, done) {
@@ -365,6 +365,8 @@
   var adminSamples = {};
   function recordRows(type, records) {
     var own;
+    // 车辆事项 keeps its own demo rows in the role workflow store, so no local sample fallback.
+    if (type === 'vehicle') return (records.vehicleRequests || []).filter(function (record) { return record.type !== 'parking'; });
     if (type === 'request') own = records.requests;
     else if (type === 'release') own = ownReleases();
     else if (type === 'monitor') own = journeyRecords('monitorRequests');
@@ -401,6 +403,7 @@
   function vehicleStatus(record) {
     return { enterprise_pending: '待企业审批', property_pending: '待物业审批', finance_pending: '待物业办理', approved: '已完成', rejected: '已驳回' }[record.status] || domainStatus(record);
   }
+  var vehicleStatusText = { enterprise_pending: '待企业审批', property_pending: '待物业审核', finance_pending: '待财务办理', approved: '已批准', rejected: '已驳回' };
   function recordState(type, record) {
     if (type === 'request') return record.sample ? { enterprise: '待企业审批', property: '待物业审批', execution: '待物业办理', approved: '已批准', rejected: '已驳回', withdrawn: '已撤回' }[record.status] : workflows.requestState(record) || '状态未标记';
     if (type === 'vehicle') return vehicleStatus(record);
@@ -414,6 +417,7 @@
   function recordOpen(type, record) { return !/已完成|已撤回|已驳回|已取消|已过期|已使用|查验通过|已核销/.test(recordState(type, record)); }
   function recordTitle(type, record) {
     if (type === 'request') return requestTitle(record);
+    if (type === 'vehicle') return record.category || '车辆事项';
     if (type === 'release') return record.items || '物品放行单';
     if (type === 'feedback') return record.title || '意见反馈';
     if (type === 'venue') return record.room || '场地预定费';
@@ -501,6 +505,10 @@
       return list.concat([['处理进度', history(record.propertyHistory)]]);
     }
     if (type === 'special') return fields.concat([['处理结果', record.result || '暂无'], ['处理进度', history(record.history)]]);
+    if (type === 'vehicle') {
+      var submitters = { employee: '企业员工', admin: '企业管理员', property: '物业人员' };
+      return [['事项类型', record.category || '车辆事项']].concat(fields, [['申请企业', record.company || company], ['提交人', submitters[record.owner] || '企业员工'], ['审批进度', history(record.history)]]);
+    }
     if (type === 'release' || type === 'monitor') return fields.concat([['审批进度', history(record.history)]]);
     if (type === 'repair') return fields.concat([['处理进度', history(record.history)]]);
     return fields;

@@ -14,15 +14,18 @@
   var profile = document.getElementById('profile');
   var screen = document.querySelector('.screen');
   if (!list || !profile || !screen || window.__propertyMessages) return;
-  var key = 'park-property-messages-v1-property';
+  var key = 'v4:park-property-messages-v1-property';
   var contacts = [
     { id: 'enterprise-repair', name: '星桥科技 · 刘女士', kind: '企业联系', context: 'A 座 605 室 · 空调报修', at: '09:35', text: '办公室空调制冷不正常，下午有客户来访，请问可以安排人员检查吗？' },
     { id: 'enterprise-meeting', name: '云启研发 · 陈先生', kind: '企业联系', context: '公共会议室 · 设备协助', at: '09:20', text: '下午的会议需要使用投屏设备，能否提前协助检查连接？' },
     { id: 'visitor-access', name: '张先生', kind: '访客联系', context: 'A 座来访 · 车辆通行', at: '09:10', text: '我来拜访 A 座的企业，已提交访客登记，车辆到门口后需要出示什么信息？' }
   ];
   var notices = [
-    { id: 'equipment', at: function () { var n = new Date(); return Math.min(new Date(n.getFullYear(), n.getMonth(), n.getDate(), 8, 30).getTime(), Date.now() - 20 * 60000); }, title: '会议室设备巡检提醒', text: '交班前请核对公共会议室投屏设备与照明情况。发现异常时记录位置和故障现象，交由值班人员跟进。' },
-    { id: 'handover', at: function () { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1, 18).getTime(); }, title: '访客通行交班提醒', text: '交班时请核对待到访登记与企业接待联系人。车辆通行问题需核实登记信息，不在消息中收集身份证照片。' }
+    // 物业人员只接收需要自己处理的工单、核验、交班和巡检事务，不混入首页公共公告。
+    { id: 'repair-order', type: '维修工单', at: function () { return Date.now() - 5 * 60000; }, title: '有新的维修工单待处理', text: 'A 座 605 室提交空调报修，请查看位置、故障描述和联系人，安排人员处理后更新工单状态。' },
+    { id: 'release-check', type: '放行核验', at: function () { return Date.now() - 12 * 60000; }, title: '物品放行申请待核验', text: '星桥科技提交了物品放行申请，请在出园前核对物品清单、数量和放行地点，核验后更新申请结果。' },
+    { id: 'equipment', type: '设备巡检', at: function () { var n = new Date(); return Math.min(new Date(n.getFullYear(), n.getMonth(), n.getDate(), 8, 30).getTime(), Date.now() - 20 * 60000); }, title: '会议室设备巡检提醒', text: '交班前请核对公共会议室投屏设备与照明情况。发现异常时记录位置和故障现象，交由值班人员跟进。' },
+    { id: 'handover', type: '访客交班', at: function () { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1, 18).getTime(); }, title: '访客通行交班提醒', text: '交班时请核对待到访登记与企业接待联系人。车辆通行问题需核实登记信息，不在消息中收集身份证照片。' }
   ];
   var state = { threads: {}, readNotices: [] };
   var active = null, mounted = false, storageFailed = false;
@@ -30,7 +33,7 @@
   var clientRoles = [{ id: 'guest', name: '未认证访客', identity: '未认证访客' }, { id: 'employee', name: '王晓明', identity: '企业员工' }, { id: 'admin', name: '唐慧丽', identity: '企业管理员' }];
   function leasingData(role) {
     var saved = {};
-    try { saved = JSON.parse(localStorage.getItem('park-message-journey-v1-' + role) || '{}') || {}; } catch (e) {}
+    try { saved = JSON.parse(localStorage.getItem('v4:park-message-journey-v1-' + role) || '{}') || {}; } catch (e) {}
     var data = Object.assign({ read: [], chat: [], draft: '', context: 'A 座 320m² 研发办公空间', consultants: {} }, saved);
     data.chat = Array.isArray(data.chat) ? data.chat.filter(function (m) { return m && typeof m.text === 'string' && typeof m.self === 'boolean'; }) : [];
     data.read = Array.isArray(data.read) ? data.read : [];
@@ -120,7 +123,7 @@
     // Move the original smart entry with its listeners and role-isolated records.
     if (smartEntry) { inbox.querySelector('.message-categories').after(smartEntry); }
     noticeList.querySelector('ul').innerHTML = notices.map(function (n) {
-      return '<li><button type="button" class="category-entry" data-property-notice="' + n.id + '"><span class="category-kind">物业通知</span><strong>' + escape(n.title) + '</strong><span class="category-preview">' + escape(n.text) + '</span>' + (!state.readNotices.includes(n.id) ? '<i class="category-unread" aria-label="未读"></i>' : '') + '</button></li>';
+      return '<li><button type="button" class="category-entry" data-property-notice="' + n.id + '"><span class="category-kind">物业通知 · ' + escape(n.type) + '</span><strong>' + escape(n.title) + '</strong><span class="category-preview">' + escape(n.text) + '</span>' + (!state.readNotices.includes(n.id) ? '<i class="category-unread" aria-label="未读"></i>' : '') + '</button></li>';
     }).join('');
     if (mounted) syncBadge();
     window.dispatchEvent(new Event('property-message-change'));
@@ -185,7 +188,7 @@
     event.stopPropagation();
     if (!property()) return;
     var leasing = event.target.closest('[data-property-leasing]');
-    if (leasing) { clearImage(); leasingRole = leasing.dataset.propertyLeasing; active = null; var data = leasingData(leasingRole); data.propertyReadCount = leasingHistory(data, leasingRole).length; try { localStorage.setItem('park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { storageFailed = true; } renderInbox(); renderChat(); window.__showMiniPage(chat.id); input.focus(); return; }
+    if (leasing) { clearImage(); leasingRole = leasing.dataset.propertyLeasing; active = null; var data = leasingData(leasingRole); data.propertyReadCount = leasingHistory(data, leasingRole).length; try { localStorage.setItem('v4:park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { storageFailed = true; } renderInbox(); renderChat(); window.__showMiniPage(chat.id); input.focus(); return; }
     if (event.target.closest('[data-property-notices]')) { window.__showMiniPage(noticeList.id); return; }
     var contact = event.target.closest('[data-property-contact]');
     if (contact) { open(contact.dataset.propertyContact); return; }
@@ -201,7 +204,7 @@
     window.__showMiniPage(detail.id); detail.querySelector('h1').focus();
   });
   input.addEventListener('input', function () {
-    if (property() && leasingRole) { var data = leasingData(leasingRole); data.propertyDraft = input.value; try { localStorage.setItem('park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { status.textContent = '草稿无法保存。'; } updateSend(); renderInbox(); return; }
+    if (property() && leasingRole) { var data = leasingData(leasingRole); data.propertyDraft = input.value; try { localStorage.setItem('v4:park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { status.textContent = '草稿无法保存。'; } updateSend(); renderInbox(); return; }
     if (!property() || !active) return;
     thread(active).draft = input.value.slice(0, 500); save(); updateSend(); renderInbox();
     status.textContent = storageFailed ? '草稿无法保存到本机，刷新后可能丢失。' : '草稿已保存到本机；回复尚未送达对方。';
@@ -214,7 +217,7 @@
       var identity = window.__roleWorkflows && window.__roleWorkflows.propertyIdentity();
       data.chat.push({ text: input.value.trim().slice(0, 500) || '[图片]', image: selectedImage ? selectedImage.src : undefined, self: false, senderRole: 'property', senderName: typeof identity === 'string' ? identity : '物业人员', at: Date.now() }); data.propertyDraft = ''; data.propertyReadCount = data.chat.length;
       data.read = data.read.filter(function (id) { return id !== '招商空间咨询'; });
-      try { localStorage.setItem('park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { status.textContent = '回复保存失败，请重试。'; return; }
+      try { localStorage.setItem('v4:park-message-journey-v1-' + leasingRole, JSON.stringify(data)); } catch (e) { status.textContent = '回复保存失败，请重试。'; return; }
       clearImage(); renderChat(); renderInbox(); window.dispatchEvent(new Event('leasing-message-change')); return;
     }
     if (!property() || !active || (!input.value.trim() && !selectedImage)) return;
@@ -232,11 +235,11 @@
   }).observe(screen, { subtree: true, attributes: true, attributeFilter: ['class'] });
   window.__propertyMessages = { open: open, clearUnread: function () {
     if (!property()) return;
-    clientRoles.forEach(function (client) { var data = leasingData(client.id); data.propertyReadCount = leasingHistory(data, client.id).length; try { localStorage.setItem('park-message-journey-v1-' + client.id, JSON.stringify(data)); } catch (e) { storageFailed = true; } });
+    clientRoles.forEach(function (client) { var data = leasingData(client.id); data.propertyReadCount = leasingHistory(data, client.id).length; try { localStorage.setItem('v4:park-message-journey-v1-' + client.id, JSON.stringify(data)); } catch (e) { storageFailed = true; } });
     contacts.forEach(function (c) { thread(c.id).read = true; });
     state.readNotices = notices.map(function (n) { return n.id; }); save(); renderInbox();
   }, pendingCount: function () { return contacts.length; } };
   window.addEventListener('leasing-message-change', function () { if (mounted) { renderInbox(); if (leasingRole && !chat.classList.contains('hidden')) renderChat(); } });
-  window.addEventListener('storage', function (event) { if (event.key && event.key.indexOf('park-message-journey-v1-') === 0 && mounted) { renderInbox(); if (leasingRole) renderChat(); } });
+  window.addEventListener('storage', function (event) { if (event.key && event.key.indexOf('v4:park-message-journey-v1-') === 0 && mounted) { renderInbox(); if (leasingRole) renderChat(); } });
   syncRole();
 })();

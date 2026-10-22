@@ -21,7 +21,7 @@
     var records = [], draft = '', archives = [], lastActivity = null, activeRole = '', timer, viewing = false;
     var idleLimit = 24 * 60 * 60 * 1000;
     function role() { return profile.dataset.role || 'guest'; }
-    function key() { return 'park-smart-qa-v1-' + activeRole; }
+    function key() { return 'v4:park-smart-qa-v1-' + activeRole; }
     function persist(value) {
       try { localStorage.setItem(key(), JSON.stringify(value)); return true; }
       catch (error) { return false; }

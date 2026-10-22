@@ -33,16 +33,39 @@
   }
   function toggle(label, key, on) {
     var input = el('input'); input.type = 'checkbox'; input.className = 'profile-info-switch'; input.setAttribute('role', 'switch'); input.setAttribute('aria-label', label);
-    var saved = null; try { saved = localStorage.getItem('profile-pref-' + key); } catch (error) {}
+    var saved = null; try { saved = localStorage.getItem('v4:profile-pref-' + key); } catch (error) {}
     input.checked = saved === null ? on : saved === '1';
-    input.onchange = function () { try { localStorage.setItem('profile-pref-' + key, input.checked ? '1' : '0'); } catch (error) {} };
+    input.onchange = function () { try { localStorage.setItem('v4:profile-pref-' + key, input.checked ? '1' : '0'); } catch (error) {} };
     return input;
   }
   function paragraph(text) { return el('p', text, 'profile-info-text'); }
   function show(id) { window.__showMiniPage(id); if (window.lucide) window.lucide.createIcons(); screen.scrollTop = 0; }
 
+  // 后台「系统资料配置」的内容字段：有值时作为详情页正文，为空时沿用页面内置兜底文案。
+  function systemRow(section) {
+    var items = (window.__parkContent && window.__parkContent.get && window.__parkContent.get()['profile-system-config']) || [];
+    return items.filter(function (item) { return item && item.section === section && ['online', 'enabled'].indexOf(item.status) !== -1; })[0] || null;
+  }
+  function systemText(section) {
+    var row = systemRow(section);
+    var text = row && row.content == null ? '' : String((row && row.content) || '').trim();
+    return text;
+  }
+  // 后台内容按空行或换行切分成段落，渲染成与内置文档一致的正文块。
+  function systemBlock(section) {
+    var text = systemText(section);
+    if (!text) return null;
+    var row = systemRow(section);
+    var box = el('div', undefined, 'profile-info-list profile-info-article');
+    var block = el('div', undefined, 'profile-info-article-block');
+    if (row && row.title) block.append(el('h3', String(row.title)));
+    text.split(/\n{2,}|\n/).map(function (line) { return line.trim(); }).filter(Boolean)
+      .forEach(function (line) { block.append(paragraph(line)); });
+    box.append(block);
+    return box;
+  }
   // Binding is a local application preview, not an authentication grant.
-  var bindingKey = 'profile-company-binding-v1', bindingPage = page('profile-company-binding', '绑定企业');
+  var bindingKey = 'v4:profile-company-binding-v1', bindingPage = page('profile-company-binding', '绑定企业');
   bindingPage.classList.add('company-binding-page');
   function bindingRecord() {
     try { var value = JSON.parse(localStorage.getItem(bindingKey) || 'null'); return value && value.owner === 'guest' && ['pending', 'approved', 'rejected'].includes(value.status) ? value : null; } catch (error) { return null; }
@@ -209,6 +232,7 @@
   // ---- 隐私与授权 ----
   function openPrivacy() {
     var node = page('profile-privacy', '隐私与授权'); node.replaceChildren();
+    var remote = systemBlock('隐私与授权'); if (remote) node.append(remote);
     node.append(group('系统权限', [
       row('位置信息', '使用时询问', { note: '用于园区导航、到访签到，不会在后台持续获取' }),
       row('相机', '使用时询问', { note: '用于扫码通行、报修拍照上传' }),
@@ -273,7 +297,9 @@
       var block = el('div', undefined, 'profile-info-article-block');
       block.append(el('h3', item[0]));
       if (item.length > 2) block.append(paragraph('提供方：' + item[1]), paragraph('共享信息：' + item[2]), paragraph('使用目的：' + item[3]));
-      else block.append(paragraph(item[1]));
+      // 后台内容可能含换行，按行拆成多段，内置文案只有一行时行为不变。
+      else String(item[1]).split(/\n{2,}|\n/).map(function (line) { return line.trim(); }).filter(Boolean)
+        .forEach(function (line) { block.append(paragraph(line)); });
       box.append(block);
     });
     node.append(box);
@@ -287,6 +313,7 @@
     var badge = el('span', undefined, 'profile-info-hero-icon'); badge.append(icon('headset'));
     var copy = el('div'); copy.append(el('strong', '星桥园区服务中心'), el('span', '工作日 09:00-18:00 · 节假日 10:00-16:00'));
     hero.append(badge, copy); node.append(hero);
+    var remote = systemBlock('联系客服'); if (remote) node.append(remote);
     node.append(group('联系方式', [
       row('客服热线', hotline.text, { href: 'tel:' + hotline.tel }),
       row('在线客服', '平均 3 分钟内回复', { onClick: function () {
@@ -320,12 +347,16 @@
     var node = page('profile-about', '关于我们'); node.replaceChildren();
     var hero = el('div', undefined, 'profile-info-brand');
     var logo = el('img'); logo.src = 'miniprogram/assets/branding/xingqiao-mini-program-logo-v4-square.png'; logo.alt = '';
-    hero.append(logo, el('strong', '星桥科创园'), el('span', '版本 3.2.0'));
+    hero.append(logo, el('strong', '星桥科创园'), el('span', '版本 4.0.0'));
     node.append(hero);
-    var intro = el('div', undefined, 'profile-info-list profile-info-article');
-    var block = el('div', undefined, 'profile-info-article-block');
-    block.append(el('h3', '园区简介'), paragraph('星桥科创园位于天津滨海高新区，总建筑面积约 18 万平方米，由五栋科创楼宇组成，提供灵活办公、研发办公与产业配套空间。园区聚焦新一代信息技术、智能制造与生物医药，现已入驻企业 260 余家。'));
-    intro.append(block); node.append(intro);
+    var remote = systemBlock('关于我们');
+    if (remote) node.append(remote);
+    else {
+      var intro = el('div', undefined, 'profile-info-list profile-info-article');
+      var block = el('div', undefined, 'profile-info-article-block');
+      block.append(el('h3', '园区简介'), paragraph('星桥科创园位于天津滨海高新区，总建筑面积约 18 万平方米，由五栋科创楼宇组成，提供灵活办公、研发办公与产业配套空间。园区聚焦新一代信息技术、智能制造与生物医药，现已入驻企业 260 余家。'));
+      intro.append(block); node.append(intro);
+    }
     node.append(group('园区信息', [
       row('运营单位', '天津星桥科创园运营管理有限公司'),
       row('园区地址', '天津市滨海高新区华苑产业区海泰发展六道6号'),
@@ -341,7 +372,19 @@
     window.__setMiniRoute(node.id, '关于我们', 'profile'); show(node.id);
   }
 
-  var handlers = { '隐私与授权': openPrivacy, '联系客服': openService, '关于我们': openAbout };
+  // 后台有内容就用后台正文，否则保留内置兜底文案。
+  function remoteDoc(section, fallback) {
+    var text = systemText(section);
+    if (!text) return fallback;
+    var row = systemRow(section);
+    return [[String((row && row.title) || section), text]];
+  }
+  function openAgreement() { openDoc('profile-user-agreement', '用户协议', remoteDoc('用户协议', userAgreement), 'profile'); }
+  function openCancel() {
+    var fallback = [['申请注销账号', '注销后账号及相关数据将被清除且无法恢复。如需办理，请联系园区服务中心 ' + hotline.text + '。']];
+    openDoc('profile-account-cancel', '账号注销', remoteDoc('账号注销', fallback), 'profile');
+  }
+  var handlers = { '隐私与授权': openPrivacy, '用户协议': openAgreement, '联系客服': openService, '关于我们': openAbout, '账号注销': openCancel };
   // Capture phase so these pages replace older notice / privacy handlers on the same rows.
   profile.addEventListener('click', function (event) {
     var button = event.target.closest('[data-profile-entry]'); if (!button) return;

@@ -79,16 +79,12 @@
   }
   window.__messageTime = messageTime;
   function stamp(card, at) { card.dataset.at = String(at || 0); card.querySelector('time').textContent = messageTime(at); }
-  function noticeAt(id) {
-    var now = new Date(), y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
-    return { '园区服务通知': new Date(y, 8, 12, 10).getTime(), 'example-message-9': Math.min(new Date(y, m, d, 9).getTime(), Date.now() - 30 * MIN), 'example-message-10': new Date(y, m, d - 1, 16, 30).getTime(), 'example-message-11': new Date(y, 9, 3, 9, 30).getTime() }[id];
-  }
   var storageWarning = document.createElement('p');
   storageWarning.className = 'journey-warning';
   storageWarning.setAttribute('role', 'status');
   storageWarning.hidden = true;
   list.appendChild(storageWarning);
-  function key() { return 'park-message-journey-v1-' + (profile.dataset.role || 'guest'); }
+  function key() { return 'v4:park-message-journey-v1-' + (profile.dataset.role || 'guest'); }
   function load() {
     state = { read: [], chat: [], draft: '', context: 'A 座 320m² 研发办公空间', consultants: {} };
     try {
@@ -127,7 +123,15 @@
     var lastChat = state.chat[state.chat.length - 1];
     cards[0].querySelector('.message-preview').textContent = (lastChat || conversation[conversation.length - 1]).text;
     stamp(cards[0], lastChat && lastChat.at ? lastChat.at : Date.now() - tl.wang);
-    cards.forEach(function (card) { if (card.dataset.category === '3') stamp(card, noticeAt(card.dataset.message)); });
+    cards.forEach(function (card, index) {
+      if (card.dataset.category !== '3') return;
+      var fixture = noticeFor(card);
+      card.querySelector('strong').textContent = fixture.type;
+      card.querySelector('.message-preview').textContent = fixture.summary;
+      var source = card.querySelector('.message-source'); if (source) source.textContent = fixture.sender + ' · ' + fixture.title;
+      stamp(card, Date.now() - Number(card.dataset.noticeIndex || 0) * MIN);
+      syncNoticeDetail(index, fixture);
+    });
     var sender = state.chat.slice().reverse().find(function (item) { return !item.self && item.senderName; });
     cards[0].querySelector('.message-row-head strong').textContent = sender ? sender.senderName : '王经理';
     cards[0].querySelector('.message-source').textContent = '物业人员 · ' + state.context;
@@ -146,6 +150,53 @@
   var categoryTitles = ['咨询消息', '其他消息', '预约消息', '园区通知'];
   var detailRoutes = ['leasing-chat', 'message-space', 'message-booking', 'message-notice'];
   var detailTitles = ['招商咨询', '空间动态', '预约进度', '园区服务通知'];
+  // 首页公告是面向所有人的公共资讯；这里仅放当前角色需要处理的事务提醒。
+  var noticeFixtures = {
+    guest: [
+      { type: '预约状态', sender: '园区服务中心', title: '访客预约待确认', summary: '您的访客预约信息已提交，待接待人员确认。', body: '请等待园区确认接待时间、联系人和入园安排，确认前请不要直接到访。' },
+      { type: '入园提醒', sender: '园区服务中心', title: '请补充访客预约信息', summary: '为完成入园安排，请补充联系人和预计到访信息。', body: '请回到访客预约页面补充所需信息，提交后等待园区服务人员确认。' },
+      { type: '服务办理', sender: '园区服务中心', title: '预约材料待查看', summary: '您的预约材料已收到，可查看当前办理状态。', body: '如需调整到访安排，请在预约详情中修改或联系园区服务人员。' },
+      { type: '预约提醒', sender: '园区服务中心', title: '请留意已提交的预约', summary: '预约状态有更新，请打开消息查看下一步安排。', body: '最终到访时间以园区确认结果为准。' }
+    ],
+    employee: [
+      { type: '维修确认', sender: '物业服务中心', title: '请确认维修处理结果', summary: '会议室门锁维修已完成，请确认问题是否解决。', body: '如问题已解决，请在我的工单中确认；如仍未解决，请补充现场情况并提交复核。' },
+      { type: '场地缴费', sender: '园区服务中心', title: '场地预定待缴费', summary: '您的场地预定待缴费，请在8小时内完成支付，逾期将自动取消。', body: '请进入我的预约或账单完成支付。超过8小时未缴费，系统将自动取消本次场地预定。' },
+      { type: '预定取消', sender: '园区服务中心', title: '场地预定超时未支付已取消', summary: '您的场地预定超过8小时未完成支付，系统已自动取消。', body: '该时段已释放给其他企业预定。如仍需使用场地，请重新提交预定并在8小时内完成支付。' },
+      { type: '审批结果', sender: '园区服务中心', title: '场地预定已通过审批', summary: '您的场地预定申请已通过，请按批准的时间使用场地。', body: '请核对预约日期、时段和费用；如需调整，请在使用前联系园区服务中心。' }
+    ],
+    admin: [
+      { type: '租赁到期', sender: '园区服务中心', title: '租赁合同即将到期', summary: '北京星桥科技 A座605室租赁合同即将到期，请及时处理续租或退租。', body: '请进入企业服务或管理后台查看合同详情，并提前安排续租、退租或资料更新。' },
+      { type: '成员审核', sender: '园区服务中心', title: '有新的成员绑定申请待审核', summary: '员工提交了企业绑定申请，请核对身份后处理。', body: '请进入成员管理查看申请资料，通过后员工才可以使用企业员工服务。' },
+      { type: '场地缴费', sender: '园区服务中心', title: '企业场地预定待缴费', summary: '企业场地预定尚未完成支付，请在8小时内处理，逾期将自动取消。', body: '请在管理后台核对预约信息并完成支付。超过8小时未缴费，系统将自动取消本次预定。' },
+      { type: '企业办理', sender: '园区服务中心', title: '企业资料有新的办理进度', summary: '企业服务申请状态已更新，请打开查看处理结果。', body: '如需补充材料或确认事项，请根据申请详情完成后续处理。' }
+    ],
+    property: [
+      { type: '维修工单', sender: '物业服务中心', title: '有新的维修工单待处理', summary: '企业提交了新的维修申请，请及时安排处理。', body: '请在物业工作台查看位置、故障描述和联系人，处理完成后更新工单状态。' },
+      { type: '放行核验', sender: '物业服务中心', title: '物品放行申请待核验', summary: '有新的物品放行申请，请核对物品和放行地点。', body: '请完成现场核验后，在物业工作台更新申请结果。' },
+      { type: '访客交班', sender: '物业服务中心', title: '访客通行交班提醒', summary: '交班时请核对待到访登记与企业接待联系人。', body: '车辆通行问题需核实登记信息，不在消息中收集身份证照片。' },
+      { type: '设备巡检', sender: '物业服务中心', title: '会议室设备巡检提醒', summary: '交班前请核对公共会议室投屏设备与照明情况。', body: '发现异常时记录位置和故障现象，交由值班人员跟进。' }
+    ]
+  };
+  function noticeFor(card) {
+    var role = profile.dataset.role || 'guest';
+    var notices = noticeFixtures[role] || noticeFixtures.guest;
+    return notices[Number(card.dataset.noticeIndex)] || notices[0];
+  }
+  function syncNoticeDetail(index, fixture) {
+    var detail = document.getElementById(detailRoutes[index]);
+    if (!detail) return;
+    var titleNode = detail.querySelector('[data-notice-title],h1');
+    var senderNode = detail.querySelector('[data-notice-sender],.journey-meta');
+    var summaryNode = detail.querySelector('[data-notice-summary],[data-example-summary]');
+    var bodyNode = detail.querySelector('[data-notice-body],[data-example-body]');
+    var kicker = detail.querySelector('[data-notice-kicker],.journey-kicker');
+    if (kicker) kicker.textContent = '园区通知 · ' + fixture.type;
+    if (titleNode) titleNode.textContent = fixture.title;
+    if (senderNode) senderNode.textContent = fixture.sender;
+    if (summaryNode) summaryNode.textContent = fixture.summary;
+    if (bodyNode) bodyNode.textContent = fixture.body;
+    detailTitles[index] = '园区通知';
+  }
   var categories = document.createElement('div'); categories.className = 'message-categories';
   categories.setAttribute('role', 'group'); categories.setAttribute('aria-label', '通知入口');
   cards.forEach(function (card, index) { card.dataset.category = String(index); });
@@ -213,15 +264,16 @@
     card.parentElement.hidden = !conversation;
     if (!conversation && card.dataset.category !== '3') card.dataset.messageRetired = 'true';
   });
+  cards.filter(function (card) { return card.dataset.category === '3'; }).forEach(function (card, index) { card.dataset.noticeIndex = String(index); });
   list.querySelector('#message-conversations-title').firstChild.textContent = '对话';
   list.querySelector('#message-conversations-title span').textContent = '3 个会话';
   list.querySelector('#message-notices-title').hidden = true;
   list.querySelector('#message-notices-title').nextElementSibling.hidden = true;
   var categoryContent = [
     '<span class="category-person" aria-hidden="true"><img class="manager-avatar-image" src="miniprogram/assets/manager-wang.png" alt=""></span><span class="category-copy"><span class="category-row"><strong>王经理</strong><time data-list-time></time></span><span class="category-context" data-list-context></span><span class="category-preview" data-list-preview></span><span class="category-unread" data-list-unread aria-hidden="true"></span></span>',
-    '<span class="category-row"><span class="category-kind"><i data-lucide="building-2" aria-hidden="true"></i>空间更新</span><time data-list-time></time></span><span class="category-space-body"><img src="miniprogram/assets/spaces/space-card-1.png.webp" alt="A 座研发办公空间"><span class="category-copy"><strong>A 座 · 320m² 研发办公</strong><span class="category-context">星桥科创园</span><span class="category-preview" data-list-preview></span></span></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">查看空间动态 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
+    '<span class="category-row"><span class="category-kind"><i data-lucide="building-2" aria-hidden="true"></i>空间更新</span><time data-list-time></time></span><span class="category-space-body"><img src="miniprogram/assets/spaces/space-card-1.png" alt="A 座研发办公空间"><span class="category-copy"><strong>A 座 · 320m² 研发办公</strong><span class="category-context">星桥科创园</span><span class="category-preview" data-list-preview></span></span></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">查看空间动态 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
     '<span class="category-row"><span class="category-kind"><i data-lucide="calendar-check" aria-hidden="true"></i>看房预约</span><time data-list-time></time></span><strong>等待园区确认</strong><span class="category-context">A 座 · 320m² 研发办公</span><span class="category-progress"><span>申请已提交</span><i data-lucide="arrow-right" aria-hidden="true"></i><b>待确认</b></span><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">查看预约进度 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>',
-    '<span class="category-row"><span class="category-kind"><i data-lucide="bell" aria-hidden="true"></i>园区服务中心</span><time data-list-time></time></span><strong>中秋节园区服务安排</strong><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">阅读全文 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>'
+    '<span class="category-row"><span class="category-kind"><i data-lucide="bell" aria-hidden="true"></i><span data-list-sender>园区服务中心</span></span><span class="category-type" data-list-type></span><time data-list-time></time></span><strong data-list-title>通知</strong><span class="category-preview" data-list-preview></span><span class="category-footer"><span class="category-unread" data-list-unread aria-hidden="true"></span><span class="category-link">阅读全文 <i data-lucide="chevron-right" aria-hidden="true"></i></span></span>'
   ];
   var categoryPages = categoryRoutes.map(function (id, category) {
     var node = page(id, categoryTitles[category], '<ul class="category-message-list" aria-label="' + categoryTitles[category] + '"></ul>');
@@ -265,6 +317,12 @@
         node.querySelector('[data-list-time]').textContent = card.querySelector('time').textContent;
         node.querySelector('[data-list-preview]').textContent = card.querySelector('.message-preview').textContent;
         node.querySelector('[data-list-unread]').hidden = !unread;
+        if (card.dataset.category === '3') {
+          var fixture = noticeFor(card);
+          var sender = node.querySelector('[data-list-sender]'); if (sender) sender.textContent = fixture.sender;
+          var type = node.querySelector('[data-list-type]'); if (type) type.textContent = fixture.type;
+          var noticeTitle = node.querySelector('[data-list-title]'); if (noticeTitle) noticeTitle.textContent = fixture.title;
+        }
         if (index === 0) node.querySelector('[data-list-context]').textContent = '招商顾问 · ' + state.context;
         node.setAttribute('aria-label', card.querySelector('strong').textContent + (unread ? '，未读，' : '，已读，') + card.querySelector('.message-preview').textContent);
       });
@@ -432,11 +490,11 @@
     var node = document.createElement('section'); node.id = id; node.className = 'hidden message-detail-page';
     node.innerHTML = content; screen.appendChild(node); window.__setMiniRoute(id, title, 'messages'); return node;
   }
-  page('message-space', '空间动态', '<article class="journey-panel"><span class="journey-kicker">空间更新</span><h1>A 座研发办公空间</h1><p class="journey-meta">星桥科创园 · 空间动态</p><img class="journey-cover" src="miniprogram/assets/spaces/space-card-1.png.webp" alt="A 座研发办公空间"><h2>了解空间，安排下一步</h2><p>320m² 研发办公空间，精装修、南向。可租状态、价格与接待时间需由园区工作人员确认。</p><dl><div><dt>关注空间</dt><dd>A 座 · 320m²</dd></div><div><dt>沟通方式</dt><dd>在线咨询</dd></div></dl></article><div class="journey-actions"><button data-page="spaces">浏览招商空间</button><button class="journey-primary" data-journey-chat>咨询顾问</button></div>');
+  page('message-space', '空间动态', '<article class="journey-panel"><span class="journey-kicker">空间更新</span><h1>A 座研发办公空间</h1><p class="journey-meta">星桥科创园 · 空间动态</p><img class="journey-cover" src="miniprogram/assets/spaces/space-card-1.png" alt="A 座研发办公空间"><h2>了解空间，安排下一步</h2><p>320m² 研发办公空间，精装修、南向。可租状态、价格与接待时间需由园区工作人员确认。</p><dl><div><dt>关注空间</dt><dd>A 座 · 320m²</dd></div><div><dt>沟通方式</dt><dd>在线咨询</dd></div></dl></article><div class="journey-actions"><button data-page="spaces">浏览招商空间</button><button class="journey-primary" data-journey-chat>咨询顾问</button></div>');
   page('message-booking', '预约进度', '<article class="journey-panel"><span class="journey-kicker">看房预约</span><h1>等待园区确认</h1><p>预约申请已提交，等待园区工作人员确认。</p><dl><div><dt>意向空间</dt><dd>A 座 · 320m² 研发办公</dd></div><div><dt>到访时间</dt><dd>待双方协商</dd></div><div><dt>接待人员</dt><dd>待园区安排</dd></div></dl><h2>处理进度</h2><ol class="journey-timeline"><li class="done"><b>提交申请</b><p>已填写意向空间与到访需求</p></li><li class="current"><b>等待确认</b><p>接待人员确认时间后，将发送预约通知。</p></li><li><b>按约到访</b><p>收到确认后，再根据入园指引安排出行。</p></li></ol></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询预约安排</button><button data-page="message-booking-help">了解预约流程</button></div>');
   page('message-booking-help', '预约指引', '<article class="journey-panel"><h1>预约前，准备这些信息</h1><ol class="journey-guide"><li><b>选择空间</b><p>明确面积、用途及预计入驻时间。</p></li><li><b>确认到访安排</b><p>与园区确认日期、人数、联系人和接待地点。</p></li><li><b>等待确认通知</b><p>申请不等于预约成功。收到正式确认后再安排到访。</p></li></ol></article><div class="journey-actions"><button data-journey-chat class="journey-primary">咨询顾问</button></div>');
   window.__setMiniRoute('message-booking-help', '预约指引', 'message-booking');
-  page('message-notice', '园区服务通知', '<article class="journey-panel"><span class="journey-kicker">园区服务</span><h1>节假日园区服务安排</h1><p class="journey-meta">园区服务中心</p><p>节假日到访或办公前，请提前了解园区各项服务安排。</p><h2>门禁与通行</h2><p>请按园区通行要求办理登记。具体开放时段以正式公告为准。</p><h2>餐厅与物业</h2><p>餐厅营业及物业值班时间待正式资料配置，当前不提供未经确认的时间或联系电话。</p><h2>需要帮助？</h2><p>可从企业服务入口查看现有服务，涉及身份验证的功能按原有权限规则处理。</p></article>');
+  page('message-notice', '园区通知', '<article class="journey-panel"><span class="journey-kicker" data-notice-kicker>园区通知</span><h1 data-notice-title></h1><p class="journey-meta" data-notice-sender></p><p data-notice-summary></p><h2>处理说明</h2><p data-notice-body></p></article>');
   document.getElementById('message-notice').classList.add('message-notice-detail');
   function chat(parent) {
     window.__setMiniRoute('leasing-chat', '招商咨询', parent);

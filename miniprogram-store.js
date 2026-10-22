@@ -1,5 +1,5 @@
 (function(){
-  var key='starbridge-demo-v1';
+  var key='v4:starbridge-demo-v1';
   var data={bookings:[],visitors:[],repairs:[],consultations:[],feedback:[]};
   var persisted;
   try{

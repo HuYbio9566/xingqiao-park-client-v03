@@ -1,17 +1,18 @@
 # 星桥科创园 · 前端演示代码
 
-**本仓库是公开前端演示库，仅用于展示页面和交互。**
+**本仓库是公开前端演示库，仅用于展示页面和交互，当前展示 V4 版本小程序前端。**
 
-- 在线演示：https://huybio9566.github.io/xingqiao-park-client-v03/miniprogram-view-v3.html
+- 在线演示：https://huybio9566.github.io/xingqiao-park-demo/
 - 仓库只包含前端 HTML、CSS、JavaScript 以及演示所需的图片、图标和第三方静态资源。
 - **不包含项目资料、需求文档、会议纪要、设计源文件、开发交接材料或任何真实业务数据。**
-- 不包含服务端、数据库、账号凭证或密钥，也未连接真实业务系统。
+- 不包含管理后台源码、业务接口源码、数据库、账号凭证或密钥，也未连接真实业务系统。
 - 页面中的房源、企业、预约等内容均为演示用示例；交互产生的记录仅保存在当前浏览器，不会提交给工作人员。
+- 演示站未连接业务接口，页面展示的是内置示例数据；管理后台入口仅在本地或与后台同源时显示。
 
-完整项目源码、项目资料和版本历史保存在同一账号下的私有备份库 `park-leasing-frontend`，不随本演示库公开发布。
+完整源码和项目资料保存在同一账号下的两个私有备份库，不随本演示库公开发布：V3 为 `xingqiao-v3-miniprogram-admin`（已锁定），V4 为 `xingqiao-v4-miniprogram-admin-api`（持续开发）。
 
 ## 本地预览
 
-在仓库目录执行 `python3 -m http.server 4174 --bind 127.0.0.1`，打开 http://127.0.0.1:4174/miniprogram-view-v3.html。
+在仓库目录执行 `python3 -m http.server 4174 --bind 127.0.0.1`，打开 http://127.0.0.1:4174/miniprogram-view-v4.html 。
 
-演示代码更新后推送本仓库的 `main` 分支，由 GitHub Pages 发布；不要将完整项目或资料目录复制到本仓库。
+演示代码更新后推送本仓库的 `main` 分支，由 GitHub Pages 发布；不要将完整项目、后台源码或资料目录复制到本仓库。

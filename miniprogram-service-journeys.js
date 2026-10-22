@@ -6,7 +6,7 @@
   var profile = document.getElementById('profile');
   if (!screen || !profile || !window.__showMiniPage || !window.__setMiniRoute) return;
 
-  var KEY = 'park-service-journeys-v1';
+  var KEY = 'v4:park-service-journeys-v1';
   var COMPANY = '北京星桥科技';
   var pages = {}, renderers = {}, parents = {}, activityTitle = '';
   var workflows = window.__roleWorkflows;
@@ -945,10 +945,10 @@
     return save(function () { state.sitePreparations.push({ id: nextId('SC'), sourceId: booking.id, type: 'booking', status: 'accepted', company: booking.company, detail: '已记录场地准备安排', history: ['物业人员记录场地准备'] }); });
   }
   function hiddenJourney(kind, item) {
-    try { return JSON.parse(localStorage.getItem('property-workorder-hidden-v1') || '[]').includes(kind + ':' + item.id); } catch (error) { return false; }
+    try { return JSON.parse(localStorage.getItem('v4:property-workorder-hidden-v1') || '[]').includes(kind + ':' + item.id); } catch (error) { return false; }
   }
   function hideJourney(kind, item) {
-    try { var list = JSON.parse(localStorage.getItem('property-workorder-hidden-v1') || '[]'); list.push(kind + ':' + item.id); localStorage.setItem('property-workorder-hidden-v1', JSON.stringify(list)); return true; } catch (error) { return false; }
+    try { var list = JSON.parse(localStorage.getItem('v4:property-workorder-hidden-v1') || '[]'); list.push(kind + ':' + item.id); localStorage.setItem('v4:property-workorder-hidden-v1', JSON.stringify(list)); return true; } catch (error) { return false; }
   }
   // Same edit/delete controls as native work-order cards; delete hides the item in the center only.
   function manageJourney(card, bar, item, kind) {
@@ -971,7 +971,7 @@
     if (active && active.classList.contains('journey-page') && !canJourney(active.id)) originalShow('profile');
   }).observe(profile, { attributes: true, attributeFilter: ['data-role'] });
 
-  // Stylesheet is linked once in miniprogram-view-v3.html; only inject it when the page has not linked it (avoids a stale duplicate).
+  // Stylesheet is linked once in miniprogram-view-v4.html; only inject it when the page has not linked it (avoids a stale duplicate).
   if (!document.querySelector('link[href*="miniprogram-service-journeys.css"]')) {
     var style = document.createElement('link'); style.rel = 'stylesheet'; style.href = 'miniprogram-service-journeys.css?v=20261017-vehicle-detail'; style.dataset.parkServiceJourneysStyle = 'true'; document.head.appendChild(style);
   }

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var profile = document.getElementById('profile'), screen = document.querySelector('.screen');
-  var company = '北京星桥科技', key = 'park-role-workflows-v1';
+  var company = '北京星桥科技', key = 'v4:park-role-workflows-v1';
   var identities = { employee: '王晓明', admin: '唐慧丽', property: '李师傅', guest: '访客用户', unauthenticated: '未登录用户' };
   // 停车费用代缴 lives in 车辆服务 (vehicleRequests); the old request type 'parking' is no longer offered.
   var types = { meeting: '场地预定申请', utilities: '水电缴费', renovation: '装修申请' };
@@ -1108,11 +1108,11 @@
   // Card 删除 hides an approval / fee card for this enterprise on this device; source records stay intact.
   var cardHidden = cardHidden || null;
   // renderProfile can run before this line during start-up, so read storage lazily.
-  function hiddenCards() { if (!cardHidden) { try { cardHidden = JSON.parse(localStorage.getItem('enterprise-card-hidden-v1') || '[]'); } catch (error) { cardHidden = []; } } return cardHidden; }
+  function hiddenCards() { if (!cardHidden) { try { cardHidden = JSON.parse(localStorage.getItem('v4:enterprise-card-hidden-v1') || '[]'); } catch (error) { cardHidden = []; } } return cardHidden; }
   function cardIsHidden(kind, id) { return hiddenCards().includes(kind + ':' + id); }
   function cardDelete(kind, id, title, note, after) {
     return action('删除', function () {
-      var run = function () { var next = hiddenCards().concat([kind + ':' + id]); try { localStorage.setItem('enterprise-card-hidden-v1', JSON.stringify(next)); cardHidden = next; } catch (error) { note.textContent = '删除失败，请检查浏览器存储设置。'; return; } after(); renderProfile(); };
+      var run = function () { var next = hiddenCards().concat([kind + ':' + id]); try { localStorage.setItem('v4:enterprise-card-hidden-v1', JSON.stringify(next)); cardHidden = next; } catch (error) { note.textContent = '删除失败，请检查浏览器存储设置。'; return; } after(); renderProfile(); };
       if (window.__miniConfirm) window.__miniConfirm({ title: '确定删除这条记录吗？', message: '删除「' + title + '」后，记录将从列表中移除且无法恢复，请谨慎操作。', confirmText: '删除', danger: true, onConfirm: run });
       else if (window.confirm('确定删除这条记录吗？删除后无法恢复。')) run();
     });
@@ -1443,7 +1443,7 @@
   window.addEventListener('property-message-change', renderProfile);
   window.__showLogin = function () { closePermission(false); showLogin(); };
   // Staff binding applications: guests submit on 「我的 → 访客用户」; the enterprise admin approves them here.
-  var memberKey = 'profile-company-binding-v1';
+  var memberKey = 'v4:profile-company-binding-v1';
   function memberApplications() {
     var rows = [];
     try { var one = JSON.parse(localStorage.getItem(memberKey) || 'null'); if (one && one.owner === 'guest') rows.push(one); } catch (error) {}

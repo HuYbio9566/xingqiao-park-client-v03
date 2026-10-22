@@ -1,7 +1,7 @@
-// Static preview configuration; partner/government external entrances. Replace with official backend data when its API is available.
+// Static preview configuration for policy-service external entrances. Replace with official backend data when its API is available.
 // url: official sites checked on 2026-10-14; opened in a new tab.
 window.enterpriseServiceCatalog = [
-  { id: 'partners', name: '合作机构', enabled: true, services: [
+  { id: 'policies', name: '政策服务', enabled: true, services: [
     { name: '高新区人社智慧大厅', logo: 'miniprogram/assets/enterprise/logos/hr-hall.png', url: 'https://tht.renyibao.com/', enabled: true },
     { name: '天津网上办事大厅', logo: 'miniprogram/assets/enterprise/logos/tianjin-gov.png', url: 'https://zwfw.tj.gov.cn/', enabled: true },
     { name: '招商银行', logo: 'miniprogram/assets/enterprise/logos/cmb.png', url: 'https://www.cmbchina.com/', enabled: true },

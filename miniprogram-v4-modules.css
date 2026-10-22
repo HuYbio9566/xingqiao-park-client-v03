@@ -1,0 +1,7 @@
+[data-v4-module][data-v4-disabled]{display:none!important}
+/* 后台「个人资料配置 → 物业工作台」关闭时，物业身份不展示工作台卡片。 */
+[data-v4-property-workbench="off"]{display:none!important}
+.v4-module-status{position:absolute;z-index:90;left:12px;right:12px;bottom:76px;margin:0;padding:7px 10px;border-radius:8px;background:#fff7e5;color:#8a641d;font-size:11px;line-height:1.4;box-shadow:0 3px 12px rgba(80,60,20,.12)}
+.v4-consult-info{display:grid;gap:6px;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#f3f8f5;color:var(--text);font-size:12px;line-height:1.5}
+.v4-consult-info strong{font-size:14px}.v4-consult-info p{margin:0;color:var(--muted)}.v4-consult-info a{color:var(--brand)}.v4-consult-info img,.v4-social-qr{display:block;width:128px;height:128px;object-fit:contain;margin:4px auto 0;background:#fff}
+.v4-news-article h1{font-size:22px;line-height:1.5}.v4-news-body{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.8}

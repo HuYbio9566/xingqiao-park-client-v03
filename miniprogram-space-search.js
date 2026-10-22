@@ -8,7 +8,7 @@
   var box = spaces.querySelector('.space-finder-search');
   var field = box.querySelector('input');
   var selects = Array.from(spaces.querySelectorAll('.space-finder-filters select'));
-  var HISTORY_KEY = 'park-space-search-history-v1', MAX_HISTORY = 10;
+  var HISTORY_KEY = 'v4:park-space-search-history-v1', MAX_HISTORY = 10;
   var HOT = ['研发办公', '精装修', 'A座', '可分割', '南向', '中央空调'];
   var keyword = '';
 

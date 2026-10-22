@@ -328,12 +328,12 @@
   }
   function cardBar(card) { var bar = actions(card); bar.classList.add('approval-card-actions'); return bar; }
   var hiddenWorkorders = [];
-  try { hiddenWorkorders = JSON.parse(localStorage.getItem('property-workorder-hidden-v1') || '[]'); } catch (error) {}
+  try { hiddenWorkorders = JSON.parse(localStorage.getItem('v4:property-workorder-hidden-v1') || '[]'); } catch (error) {}
   function hiddenKey(kind, item) { return kind + ':' + item.id; }
   function hiddenWorkorder(kind, item) { return !!item && hiddenWorkorders.includes(hiddenKey(kind, item)); }
   function hideWorkorder(kind, item) {
     var next = hiddenWorkorders.concat([hiddenKey(kind, item)]);
-    try { localStorage.setItem('property-workorder-hidden-v1', JSON.stringify(next)); hiddenWorkorders = next; return true; } catch (error) { return false; }
+    try { localStorage.setItem('v4:property-workorder-hidden-v1', JSON.stringify(next)); hiddenWorkorders = next; return true; } catch (error) { return false; }
   }
   // Property can edit common text fields or remove a work order from this center; source records stay intact.
   // Card buttons: secondary actions (详情 / 删除) on the left, the primary action rightmost. No inline edit.

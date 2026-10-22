@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var assets = 'miniprogram/assets/enterprise/';
-  var journeyKey = 'park-service-journeys-v1';
+  var journeyKey = 'v4:park-service-journeys-v1';
   var journeyState = { activityRegistrations: [], diningOrders: [], parkingOrders: [], specialTickets: [], monitorRequests: [] };
   var journeySamples = {
     diningOrders: [{ id: 'DINING-001', owner: 'employee', company: '北京星桥科技', sample: true, title: '会议茶歇套餐', status: '已登记', detail: 'A座 2F · 2026-10-20 12:00 · 8份', note: '' }],
